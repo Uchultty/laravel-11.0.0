@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .ui-page {
+        @apply space-y-6;
+    }
+
+    .ui-card {
+        @apply rounded-2xl border border-ink-200 bg-white shadow-panel;
+    }
+
+    .ui-card-body {
+        @apply p-5 sm:p-6;
+    }
+
+    .ui-alert-success {
+        @apply rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700;
+    }
+
+    .ui-table-wrap {
+        @apply overflow-x-auto;
+    }
+
+    .ui-table {
+        @apply w-full min-w-full table-auto divide-y divide-ink-200;
+    }
+
+    .ui-table thead {
+        @apply bg-ink-50;
+    }
+
+    .ui-table th {
+        @apply px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink-600;
+    }
+
+    .ui-table td {
+        @apply px-4 py-3 text-sm text-ink-700;
+    }
+
+    .ui-table tbody tr {
+        @apply border-b border-ink-100 transition hover:bg-ink-50/70;
+    }
+
+    .ui-label {
+        @apply mb-1.5 block text-sm font-semibold text-ink-700;
+    }
+
+    .ui-input {
+        @apply block w-full rounded-xl border-ink-300 text-sm text-ink-900 shadow-sm focus:border-brand-500 focus:ring-brand-500;
+    }
+
+    .ui-help {
+        @apply mt-1 text-xs text-ink-500;
+    }
+
+    .ui-error {
+        @apply mt-1 text-xs font-medium text-rose-600;
+    }
+
+    .ui-actions {
+        @apply flex flex-wrap items-center gap-3 pt-2;
+    }
+
+    .ui-btn-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow transition hover:from-brand-700 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+    }
+
+    .ui-btn-secondary {
+        @apply inline-flex items-center justify-center rounded-xl border border-ink-300 bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:bg-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-400 focus:ring-offset-2;
+    }
+
+    .ui-btn-danger {
+        @apply inline-flex items-center justify-center rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2;
+    }
+
+    .ui-link {
+        @apply text-sm font-semibold text-brand-600 hover:text-brand-700;
+    }
+}
