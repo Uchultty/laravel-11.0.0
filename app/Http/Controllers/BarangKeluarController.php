@@ -9,6 +9,7 @@ use App\Models\Shipment as BarangKeluar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Mpdf\Mpdf;
 
 class BarangKeluarController extends Controller
 {
@@ -91,6 +92,7 @@ class BarangKeluarController extends Controller
             'id_customer' => 'nullable|exists:pelanggan,id_pelanggan',
             'quantity' => 'required|integer|min:1',
             'no_po' => 'nullable|string|max:100',
+            'no_gambar' => 'nullable|string|max:100',
             'tanggal_keluar' => 'required|date',
             'status_pengiriman' => 'nullable|string|in:Siap Dikirim,Sedang Dikirim,Selesai',
             'surat_jalan' => 'nullable|file|max:5120',
@@ -121,6 +123,7 @@ class BarangKeluarController extends Controller
             'id_pelanggan' => $validated['id_customer'] ?? $prefillData['id_customer'] ?? null,
             'id_barang_proses' => $idBarangProses,
             'no_po' => $validated['no_po'] ?? ($prefillData['no_po'] ?? null),
+            'no_gambar' => $validated['no_gambar'] ?? ($prefillData['no_gambar'] ?? null),
             'qty' => $validated['quantity'],
             'tanggal_pengiriman' => $validated['tanggal_keluar'],
             'status_pengiriman' => $validated['status_pengiriman'] ?? 'Siap Dikirim',
@@ -180,49 +183,48 @@ class BarangKeluarController extends Controller
 
     public function show(BarangKeluar $pengiriman_produk)
     {
-        $pengiriman_produk->load(['barang', 'customer', 'user']);
+        $pengiriman_produk->load(['barang', 'customer', 'user', 'productionItem.material']);
 
         return view('barang-keluar.show', compact('pengiriman_produk'));
     }
 
-    public function generateSuratJalan(BarangKeluar $pengiriman_produk)
+    public function suratJalan(BarangKeluar $pengiriman_produk)
     {
-        $pengiriman_produk->load(['barang', 'customer', 'user']);
+        $pengiriman_produk->loadMissing(['barang', 'customer', 'productionItem.material']);
 
-        $data = [
-            'nomor_surat_jalan' => $pengiriman_produk->surat_jalan_number ?? $pengiriman_produk->id_pengiriman,
-            'tanggal_kirim' => optional($pengiriman_produk->tanggal_pengiriman)->format('d/m/Y') ?? '-',
-            'customer' => optional($pengiriman_produk->customer)->nama ?? '-',
-            'quantity' => $pengiriman_produk->qty ?? '-',
-            'product_name' => optional($pengiriman_produk->barang)->nama ?? '-',
-            'product_index' => optional($pengiriman_produk->barang)->kode ?? optional($pengiriman_produk->barang)->id ?? '-',
-            'material_name' => $pengiriman_produk->material_type ?? '-',
-            'no_po' => $pengiriman_produk->no_po ?? '-',
-            'background' => public_path('images/surat-jalan-template.jpeg'),
-            'logo' => public_path('images/logo-mab.jpeg'),
-        ];
+        return view('pengiriman-produk.surat-jalan', $this->suratJalanViewData($pengiriman_produk));
+    }
 
+    public function downloadSuratJalanPdf(BarangKeluar $pengiriman_produk)
+    {
+        $pengiriman_produk->loadMissing(['barang', 'customer', 'productionItem.material']);
+
+        $data = $this->suratJalanViewData($pengiriman_produk, true);
         $html = view('pengiriman-produk.surat-jalan', $data)->render();
 
-        try {
-            $mpdf = new \Mpdf\Mpdf([
-                'format' => 'A4',
-                'margin_left' => 0,
-                'margin_right' => 0,
-                'margin_top' => 0,
-                'margin_bottom' => 0,
-            ]);
+        $mpdf = new Mpdf([
+            'format' => 'A4',
+            'orientation' => 'P',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'tempDir' => storage_path('app'),
+        ]);
 
-            // Some templates expect default fonts; ensure UTF-8
-            $mpdf->SetDisplayMode('fullpage');
-            $mpdf->WriteHTML($html);
+        $mpdf->SetTitle('Surat Jalan ' . $data['nomor_surat_jalan']);
+        $mpdf->WriteHTML($html);
 
-            $filename = 'surat-jalan-' . ($data['surat_jalan_number'] ?? $pengiriman_produk->id_pengiriman) . '.pdf';
-            return $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
-        } catch (\Throwable $e) {
-            \Log::error('Surat jalan generation error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat Surat Jalan: ' . $e->getMessage());
-        }
+        $filename = 'surat-jalan-' . str_replace(['/', ' '], '-', $data['nomor_surat_jalan']) . '.pdf';
+
+        return response(
+            $mpdf->Output($filename, 'S'),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]
+        );
     }
 
     public function edit(BarangKeluar $pengiriman_produk)
@@ -316,7 +318,7 @@ class BarangKeluarController extends Controller
         return redirect()->route('pengiriman-produk.index')->with('success', 'Pengiriman produk berhasil dihapus');
     }
 
-    public function downloadFile(Shipmenthopipmeeopar $barangKeluar, string $type)
+    public function downloadFile(BarangKeluar $barangKeluar, string $type)
     {
         if ($type === 'surat_jalan') {
             $path = $barangKeluar->surat_jalan_path;
@@ -336,6 +338,52 @@ class BarangKeluarController extends Controller
     public static function statusOptions(): array
     {
         return self::STATUS_OPTIONS;
+    }
+
+    private function suratJalanViewData(BarangKeluar $pengiriman_produk, bool $pdfMode = false): array
+    {
+        $tanggal = $pengiriman_produk->tanggal_keluar ?? $pengiriman_produk->tanggal_pengiriman ?? now();
+        $nomorSuratJalan = $this->generateNomorSuratJalan($pengiriman_produk, $tanggal);
+
+        $logoPath = public_path('images/logo-mab.png');
+        $logoSrc = $pdfMode && is_file($logoPath)
+            ? 'data:image/png;base64,' . base64_encode((string) file_get_contents($logoPath))
+            : asset('images/logo-mab.png');
+
+        $productName = optional($pengiriman_produk->barang)->nama ?? '-';
+        $materialName = data_get($pengiriman_produk, 'productionItem.material.nama')
+            ?? $pengiriman_produk->material_type
+            ?? '-';
+        $customerName = optional($pengiriman_produk->customer)->nama ?? '-';
+
+        return [
+            'pengiriman_produk' => $pengiriman_produk,
+            'nomor_surat_jalan' => $nomorSuratJalan,
+            'tanggal_kirim' => $tanggal,
+            'customer_name' => $customerName,
+            'no_po' => $pengiriman_produk->no_po ?? '-',
+            'no_gambar' => $pengiriman_produk->no_gambar ?? '-',
+            'logo_src' => $logoSrc,
+            'items' => [
+                [
+                    'no' => 1,
+                    'nama_barang' => $productName,
+                    'material' => $materialName,
+                    'quantity' => $pengiriman_produk->quantity,
+                    'keterangan' => 'No PO: ' . ($pengiriman_produk->no_po ?? '-') . ' | No Gambar: ' . ($pengiriman_produk->no_gambar ?? '-'),
+                ],
+            ],
+            'pdf_mode' => $pdfMode,
+        ];
+    }
+
+    private function generateNomorSuratJalan(BarangKeluar $pengiriman_produk, $tanggal): string
+    {
+        $rawKey = (string) $pengiriman_produk->getKey();
+        preg_match('/(\d+)/', $rawKey, $matches);
+        $sequence = isset($matches[1]) ? (int) $matches[1] : 1;
+
+        return sprintf('SJ-%03d', max(1, $sequence));
     }
 
 }

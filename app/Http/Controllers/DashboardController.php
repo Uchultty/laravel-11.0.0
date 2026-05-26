@@ -21,6 +21,19 @@ class DashboardController extends Controller
 
         $materialLowStock = Material::whereColumn('quantity', '<=', 'stok_minimum')->count();
 
+        $deadlineAlerts = ProductionItem::with(['produk', 'pelanggan'])
+            ->where('status_kirim', false)
+            ->whereNotNull('tgl_selesai')
+            ->whereDate('tgl_selesai', '<', today())
+            ->orderBy('tgl_selesai')
+            ->limit(5)
+            ->get();
+
+        $deadlineAlertsCount = ProductionItem::where('status_kirim', false)
+            ->whereNotNull('tgl_selesai')
+            ->whereDate('tgl_selesai', '<', today())
+            ->count();
+
         $barangDalamProsesCount = ProductionItem::where('status_kirim', false)->count();
 
         $barangDalamProsesLatest = ProductionItem::with(['produk', 'pelanggan'])
@@ -96,6 +109,8 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'totalMaterials',
             'materialLowStock',
+            'deadlineAlerts',
+            'deadlineAlertsCount',
             'barangDalamProsesCount',
             'barangDalamProsesLatest',
             'pengirimanTerkirim',

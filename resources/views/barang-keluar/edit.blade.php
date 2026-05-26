@@ -55,6 +55,12 @@
                 </div>
 
                 <div>
+                    <label for="no_gambar" class="ui-label">No Gambar</label>
+                    <x-ui.input type="text" id="no_gambar" name="no_gambar" value="{{ $pengiriman_produk->no_gambar ?? '' }}" />
+                    @error('no_gambar') <p class="ui-error">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label for="tanggal_keluar" class="ui-label">Tanggal Kirim</label>
                     <x-ui.input type="date" id="tanggal_keluar" name="tanggal_keluar" value="{{ $pengiriman_produk->tanggal_keluar->format('Y-m-d') }}" required />
                     @error('tanggal_keluar') <p class="ui-error">{{ $message }}</p> @enderror

@@ -55,9 +55,12 @@ Route::middleware('auth')->group(function () {
         Route::get('pengiriman-produk/{pengiriman_produk}', [BarangKeluarController::class, 'show'])
             ->where('pengiriman_produk', '[0-9]+|BKL[0-9]+')
             ->name('pengiriman-produk.show');
-        Route::get('pengiriman-produk/{pengiriman_produk}/surat-jalan', [BarangKeluarController::class, 'generateSuratJalan'])
+        Route::get('pengiriman-produk/{pengiriman_produk}/surat-jalan', [BarangKeluarController::class, 'suratJalan'])
             ->where('pengiriman_produk', '[0-9]+|BKL[0-9]+')
             ->name('pengiriman-produk.surat-jalan');
+        Route::get('pengiriman-produk/{pengiriman_produk}/surat-jalan/pdf', [BarangKeluarController::class, 'downloadSuratJalanPdf'])
+            ->where('pengiriman_produk', '[0-9]+|BKL[0-9]+')
+            ->name('pengiriman-produk.surat-jalan.pdf');
         Route::get('pengiriman-produk/{barangKeluar}/download-file/{type}', [BarangKeluarController::class, 'downloadFile'])
             ->name('pengiriman-produk.download-file');
 

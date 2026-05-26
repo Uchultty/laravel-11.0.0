@@ -18,7 +18,7 @@ class CustomerController extends Controller
             $customersQuery->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($search) . '%']);
         }
 
-        $customers = $customersQuery->latest()->paginate(10)->withQueryString();
+        $customers = $customersQuery->orderByDesc('updated_at')->paginate(10)->withQueryString();
 
         return view('pelanggan.index', compact('customers', 'search'));
     }

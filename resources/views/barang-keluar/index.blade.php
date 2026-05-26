@@ -76,6 +76,7 @@
                         <th class="text-left">Produk</th>
                         <th class="text-left">Qty</th>
                         <th class="text-left">No PO</th>
+                        <th class="text-left">No Gambar</th>
                         <th class="text-left">Customer</th>
                         <th class="text-left">Tanggal Kirim</th>
                         <th class="text-left">Status</th>
@@ -90,6 +91,7 @@
                             <td class="align-middle text-left text-sm font-semibold text-ink-800">{{ optional($item->barang)->nama ?? '-' }}</td>
                             <td class="align-middle text-left text-sm tabular-nums text-ink-700">{{ number_format($item->quantity, 0, ',', '.') }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ $item->no_po ?? '-' }}</td>
+                            <td class="align-middle text-left text-sm text-ink-700">{{ $item->no_gambar ?? '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ optional($item->customer)->nama ?? '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ optional($item->tanggal_keluar)->format('d/m/Y') ?? '-' }}</td>
                             <td class="align-middle text-left">

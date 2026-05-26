@@ -39,6 +39,10 @@
                     <p class="text-sm text-ink-900">{{ $pengiriman_produk->no_po ?? '-' }}</p>
                 </div>
                 <div>
+                    <p class="ui-label">No Gambar</p>
+                    <p class="text-sm text-ink-900">{{ $pengiriman_produk->no_gambar ?? '-' }}</p>
+                </div>
+                <div>
                     <p class="ui-label">Tanggal Kirim</p>
                     <p class="text-sm text-ink-900">{{ optional($pengiriman_produk->tanggal_keluar)->format('d/m/Y') ?? '-' }}</p>
                 </div>
@@ -90,7 +94,7 @@
             @endif
 
             <div class="ui-actions mt-6 border-t border-ink-100 pt-4">
-                <a href="{{ route('pengiriman-produk.surat-jalan', $pengiriman_produk) }}" target="_blank" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-white font-medium hover:bg-indigo-700 transition-colors">Generate Surat Jalan</a>
+                <x-ui.button :href="route('pengiriman-produk.surat-jalan', $pengiriman_produk)" target="_blank">Generate Surat Jalan</x-ui.button>
                 <x-ui.button :href="route('pengiriman-produk.edit', $pengiriman_produk)">Edit</x-ui.button>
                 <x-ui.button :href="route('pengiriman-produk.index')" variant="secondary">Kembali</x-ui.button>
             </div>

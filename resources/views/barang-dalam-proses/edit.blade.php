@@ -25,6 +25,12 @@
                 </div>
 
                 <div>
+                    <label for="no_gambar" class="ui-label">No Gambar</label>
+                    <x-ui.input type="text" name="no_gambar" id="no_gambar" value="{{ old('no_gambar', $barangDalamProses->no_gambar ?? '') }}" placeholder="Masukkan No Gambar" />
+                    @error('no_gambar') <p class="ui-error">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label for="satuan" class="ui-label">Satuan</label>
                     <input type="hidden" id="satuan" name="satuan" value="cm">
                     <div class="mt-2 rounded-lg border border-sand-200 bg-sand-50 px-4 py-3 text-sm font-semibold text-ink-800">

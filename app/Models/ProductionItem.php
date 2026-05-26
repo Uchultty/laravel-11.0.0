@@ -17,6 +17,7 @@ class ProductionItem extends Model
         'id_produk',
         'id_material',
         'id_pelanggan',
+        'no_gambar',
         'no_po',
         'id_user',
         'qty',

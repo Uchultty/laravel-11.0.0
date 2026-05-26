@@ -23,6 +23,26 @@
             </div>
         </x-ui.card>
 
+        @if($deadlineAlertsCount > 0)
+            <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-lg font-bold">
+                            !
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-amber-900">Ada {{ $deadlineAlertsCount }} barang dalam proses yang deadline-nya lewat</p>
+                            <p class="text-xs text-amber-800">Belum ditandai siap dikirim, cek daftar jika perlu follow up.</p>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('barang-dalam-proses.index') }}" class="inline-flex items-center justify-center rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 transition sm:self-start">
+                        Cek daftar
+                    </a>
+                </div>
+            </div>
+        @endif
+
         <!-- ROW 1: SUMMARY CARDS WITH ICONS -->
         <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
             <div class="rounded-2xl border border-slate-200 p-4 bg-white shadow-sm hover:shadow-md transition">

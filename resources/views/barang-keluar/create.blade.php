@@ -45,6 +45,10 @@
                                 <input type="text" id="no_po" name="no_po" class="ui-input bg-ink-50" value="{{ $prefillData['no_po'] ?? '' }}" placeholder="Nomor PO ini ambil dari barang dalam proses" readonly />
                         </div>
                         <div>
+                            <label for="no_gambar" class="ui-label">No Gambar</label>
+                            <input type="text" id="no_gambar" name="no_gambar" class="ui-input bg-ink-50 flex-1" value="{{ $prefillData['no_gambar'] ?? '' }}" placeholder="No Gambar dari Barang Dalam Proses" readonly />
+                        </div>
+                        <div>
                             <label class="ui-label">Material</label>
                             <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '-' }}" disabled />
                         </div>
@@ -251,4 +255,5 @@
     } catch (e) {
         // silent fail if JSON not present
     }
+
 </script>

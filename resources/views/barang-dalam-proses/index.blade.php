@@ -20,6 +20,7 @@
                 <thead>
                     <tr>
                         <th class="text-left">Nama Produk</th>
+                        <th class="text-left">No Gambar</th>
                         <th class="text-left">QTY</th>
                         <th class="text-left">Satuan</th>
                         <th class="text-left">Ukuran</th>
@@ -44,6 +45,7 @@
                                     -
                                 @endif
                             </td>
+                            <td class="align-middle text-left text-sm text-ink-700">{{ $item->no_gambar ?? '-' }}</td>
                             <td class="align-middle text-left text-sm tabular-nums text-ink-700">{{ number_format((int) $item->quantity, 0, ',', '.') }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ $item->satuan ?: '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ $item->ukuran ?: '-' }}</td>
@@ -83,7 +85,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada barang dalam proses.</td>
+                            <td colspan="11" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada barang dalam proses.</td>
                         </tr>
                     @endforelse
                 </tbody>

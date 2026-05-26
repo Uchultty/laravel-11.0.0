@@ -4,7 +4,7 @@
         <div class="flex items-start justify-between gap-3">
             <a href="{{ route('dashboard') }}" class="group flex items-center gap-3 transition-all duration-200">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 p-1 shadow-sm group-hover:shadow-md transition-all sm:h-13 sm:w-13 lg:h-14 lg:w-14">
-                    <img src="{{ asset('images/logo-mab.jpeg') }}" alt="PT. Metal Amanah Baru" class="h-full w-full object-contain" />
+                    <img src="{{ asset('images/logo-mab.png') }}" alt="PT. Metal Amanah Baru" class="h-full w-full object-contain" />
                 </div>
                 <div class="min-w-0" x-cloak x-show="!sidebarCollapsed">
                     <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">Pencatatan Gudang</p>
@@ -33,6 +33,12 @@
             $mainMenuClasses = 'group relative mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200';
             $mainMenuActive = 'bg-blue-500/15 text-blue-600 border-l-2 border-blue-500 pl-2.5';
             $mainMenuInactive = 'text-slate-600 hover:text-blue-600 hover:bg-blue-50';
+
+            $deadlineAlertsCount = \App\Models\ProductionItem::query()
+                ->where('status_kirim', false)
+                ->whereNotNull('tgl_selesai')
+                ->whereDate('tgl_selesai', '<', today())
+                ->count();
 
             $pengirimanProdukRouteExists = Route::has('pengiriman-produk.index');
             $laporanStokMaterialRouteExists = Route::has('laporan-stok-material.index') || Route::has('laporan-barang.index');
@@ -97,7 +103,12 @@
                     <svg class="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10" />
                     </svg>
-                    <span x-cloak x-show="!sidebarCollapsed">Data Material</span>
+                    <span x-cloak x-show="!sidebarCollapsed" class="flex items-center gap-2">
+                        <span>Data Material</span>
+                        <span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm ring-2 ring-white">
+                            !
+                        </span>
+                    </span>
                     @if(request()->routeIs('data-material.*'))
                             <div class="absolute inset-y-0 right-0 w-1 rounded-r-lg bg-blue-500"></div>
                     @endif
@@ -135,6 +146,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8M8 11h8M8 15h5M5 3h14a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z" />
                 </svg>
                 <span x-cloak x-show="!sidebarCollapsed">Barang Dalam Proses</span>
+                @if($deadlineAlertsCount > 0)
+                    <span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm ring-2 ring-white" aria-label="{{ $deadlineAlertsCount }} notifikasi barang dalam proses">
+                        {{ $deadlineAlertsCount > 99 ? '99+' : $deadlineAlertsCount }}
+                    </span>
+                @endif
                 @if(request()->routeIs('barang-dalam-proses.*'))
                     <div class="absolute inset-y-0 right-0 w-1 rounded-r-lg bg-blue-500"></div>
                 @endif

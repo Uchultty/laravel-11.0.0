@@ -48,6 +48,7 @@ class BarangDalamProsesController extends Controller
     {
         $validated = $request->validate([
             'id_barang' => 'required|exists:products,id_product',
+            'no_gambar' => 'nullable|string|max:100',
             'id_barang_mentah' => 'required|exists:materials,id_material',
             'quantity' => 'required|integer|min:1',
             'id_customer' => 'required|exists:pelanggan,id_pelanggan',
@@ -77,6 +78,7 @@ class BarangDalamProsesController extends Controller
 
                 ProductionItem::create([
                     'id_produk' => $validated['id_barang'],
+                    'no_gambar' => $validated['no_gambar'] ?? null,
                     'id_material' => $validated['id_barang_mentah'],
                     'id_user' => auth()->id(),
                     'id_pelanggan' => $validated['id_customer'] ?? null,
@@ -113,6 +115,7 @@ class BarangDalamProsesController extends Controller
     {
         $validated = $request->validate([
             'id_barang' => 'required|exists:products,id_product',
+            'no_gambar' => 'nullable|string|max:100',
             'id_barang_mentah' => 'required|exists:materials,id_material',
             'quantity' => 'required|integer|min:1',
             'id_customer' => 'required|exists:pelanggan,id_pelanggan',
@@ -169,6 +172,7 @@ class BarangDalamProsesController extends Controller
 
                 $barangDalamProses->update([
                     'id_produk' => $validated['id_barang'],
+                    'no_gambar' => $validated['no_gambar'] ?? null,
                     'id_material' => $validated['id_barang_mentah'],
                     'id_pelanggan' => $validated['id_customer'] ?? null,
                     'no_po' => $validated['no_po'],
@@ -261,6 +265,7 @@ class BarangDalamProsesController extends Controller
         $payload = [
             'id_barang_proses' => $productionItem->id_barang_proses,
             'id_barang' => $product->id_product,
+            'no_gambar' => $productionItem->no_gambar ?? null,
             'id_material' => $material->id_material,
             'quantity' => (int) $productionItem->qty,
             'id_customer' => $productionItem->id_pelanggan,

@@ -18,6 +18,7 @@ class Shipment extends Model
         'id_produk',
         'id_pelanggan',
         'no_po',
+        'no_gambar',
         'id_user',
         'qty',
         'tanggal_pengiriman',
