@@ -5,6 +5,7 @@
 
     <div class="ui-page space-y-5">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <!-- Ringkasan laporan mengikuti data yang sudah difilter di controller. -->
             <x-ui.card bodyClass="p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-ink-500">Total Item Material</p>
                 <p class="mt-2 text-2xl font-bold text-ink-900">{{ number_format($summaryTotalItem, 0, ',', '.') }}</p>
@@ -20,6 +21,7 @@
         </div>
 
         <x-ui.card bodyClass="p-4">
+            <!-- Filter diletakkan di bawah card ringkasan supaya alur baca laporan lebih enak. -->
             <form method="GET" action="{{ request()->url() }}" class="flex flex-col gap-3 md:flex-row md:items-end">
                 <div class="flex-1">
                     <label for="q" class="ui-label">Cari nama barang</label>
@@ -57,6 +59,7 @@
                 <tbody>
                     @forelse ($barangs as $barang)
                         <tr>
+                            <!-- Nama dan ukuran dipisah supaya informasi barang lebih mudah dibaca. -->
                             <td class="align-middle text-left text-sm font-semibold text-ink-800">{{ $barang->nama }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ filled($barang->ukuran) ? $barang->ukuran : '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ optional($barang->jenisBarang)->nama ?? '-' }}</td>

@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 @layer components {
+    /* background komponen global yang paling sering dipakai */
     .ui-page {
         @apply space-y-6;
     }
 
+    /* background card utama di hampir semua halaman */
     .ui-card {
         @apply rounded-2xl border border-ink-200 bg-white shadow-panel;
     }

@@ -16,6 +16,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
+    <!-- background global halaman utama -->
     <body class="font-sans antialiased bg-slate-100" x-data="{ mobileSidebarOpen: false, sidebarCollapsed: false }">
         <div class="min-h-screen md:flex">
             <!-- Mobile Sidebar Overlay -->

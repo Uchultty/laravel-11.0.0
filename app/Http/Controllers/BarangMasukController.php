@@ -286,7 +286,7 @@ class BarangMasukController extends Controller
             }
         }
 
-        // Update quantity di data material
+        // Stok material ditambah setelah order berhasil dibuat agar data persediaan tetap sinkron.
         $material->increment('quantity', $validated['quantity']);
         $material->update(['satuan' => $validated['satuan']]);
 
@@ -327,11 +327,11 @@ class BarangMasukController extends Controller
             ->where('source_barang_id', $validated['source_barang_id'])
             ->firstOrFail();
 
-        // Simpan file lama
+        // Simpan file lama supaya file yang tidak diganti tetap aman.
         $oldSuratJalan = $barangMasuk->surat_jalan_path;
         $oldInvoice = $barangMasuk->invoice_path;
 
-        // Upload file baru jika ada
+        // Upload file baru hanya kalau user memilih file pengganti.
         if ($request->hasFile('surat_jalan_path')) {
             $newSuratJalan = $request->file('surat_jalan_path')->store('persediaan-material/surat-jalan', 'public');
         }
@@ -340,11 +340,11 @@ class BarangMasukController extends Controller
             $newInvoice = $request->file('invoice_gambar')->store('persediaan-material/invoice', 'public');
         }
 
-        // Hitung perubahan quantity untuk update di tabel barang
+        // Selisih quantity dipakai untuk menyesuaikan stok material lama dan baru.
         $quantityDifference = $validated['quantity'] - $barangMasuk->qty;
         $oldMaterialId = $barangMasuk->id_material;
 
-        // Update data - gunakan approach paling simple
+        // Update header transaksi dulu, lalu stok materialnya disesuaikan.
         $barangMasuk->id_material = $material->id_material;
         $barangMasuk->qty = $validated['quantity'];
         $barangMasuk->satuan = $validated['satuan'];
@@ -360,17 +360,17 @@ class BarangMasukController extends Controller
             $barangMasuk->invoice_path = $newInvoice;
         }
 
-        // Save - ini HARUS berhasil atau throw error
+        // Simpan transaksi utama lebih dulu supaya perubahan data tercatat.
         $barangMasuk->save();
 
-        // Update quantity di tabel barang
+        // Sesuaikan stok material sesuai hasil update transaksi.
         if ($oldMaterialId === $material->id_material) {
-            // ID barang tidak berubah, hanya update quantity
+            // Material tetap sama, jadi cukup hitung selisih quantity.
             $material->quantity = ($material->quantity ?? 0) + $quantityDifference;
             $material->satuan = $validated['satuan'];
             $material->save();
         } else {
-            // ID barang berubah, kurangi dari yang lama, tambah ke yang baru
+            // Material berubah, stok lama dikurangi dan stok baru ditambah.
             $oldMaterial = Material::findOrFail($oldMaterialId);
             $oldMaterial->quantity = max(0, ($oldMaterial->quantity ?? 0) - $barangMasuk->getOriginal('qty'));
             $oldMaterial->save();

@@ -13,17 +13,20 @@ class LaporanStokMaterialController extends Controller
         $stokMinimumBatas = 10;
         $search = trim((string) $request->query('q', ''));
 
+        // Query dasar laporan stok material.
         $query = Material::query()
             ->with(['jenisBarang:id_jenis_barang,nama'])
             ->select('materials.*')
             ->latest('created_at');
 
         if ($search !== '') {
+            // Pencarian dibuat uppercase supaya hasilnya konsisten dengan input filter.
             $searchLike = '%' . mb_strtoupper($search) . '%';
 
             $query->whereRaw('UPPER(nama) LIKE ?', [$searchLike]);
         }
 
+        // Ringkasan card selalu mengikuti hasil filter yang sedang aktif.
         $summaryTotalItem = (clone $query)->count();
         $summaryTotalStok = (int) (clone $query)->sum('quantity');
         $summaryStokMenipis = (clone $query)
