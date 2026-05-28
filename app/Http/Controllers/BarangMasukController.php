@@ -238,7 +238,7 @@ class BarangMasukController extends Controller
         $validated = $request->validate([
             'source_barang_id' => 'required|exists:materials,source_barang_id',
             'quantity' => 'required|integer|min:1',
-            'satuan' => 'required|in:INCH,CM',
+            'satuan' => 'required|in:INCH,MM',
             'tanggal_masuk' => 'required|date',
             'estimasi_tiba_display' => 'nullable|date',
             'id_supplier' => 'required|exists:suppliers,id_supplier',
@@ -315,7 +315,7 @@ class BarangMasukController extends Controller
         $validated = $request->validate([
             'source_barang_id' => 'required|exists:materials,source_barang_id',
             'quantity' => 'required|integer|min:1',
-            'satuan' => 'required|in:INCH,CM',
+            'satuan' => 'required|in:INCH,MM',
             'tanggal_masuk' => 'required|date',
             'estimasi_tiba_display' => 'nullable|date',
             'id_supplier' => 'required|exists:suppliers,id_supplier',

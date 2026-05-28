@@ -53,9 +53,9 @@
 
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-ink-700 mb-2">Satuan *</label>
-                        <input type="hidden" name="satuan" value="CM">
+                        <input type="hidden" name="satuan" value="MM">
                         <div class="rounded-lg border border-ink-200 bg-ink-50 px-4 py-3 text-sm font-semibold text-ink-800">
-                            CM
+                            MM
                         </div>
                         @error('satuan') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
@@ -120,16 +120,9 @@
                     </div>
                 </div>
 
-                <div class="flex gap-3">
-                    <button type="submit" name="action" value="update" class="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2.5 text-white font-medium hover:bg-blue-600 transition-colors">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Update
-                    </button>
-                    <a href="{{ route('persediaan-material.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-slate-500 px-4 py-2.5 text-white font-medium hover:bg-slate-600 transition-colors">
-                        Batal
-                    </a>
+                <div class="ui-actions">
+                    <x-ui.button type="submit" name="action" value="update">Update</x-ui.button>
+                    <x-ui.button :href="route('persediaan-material.index')" variant="secondary">Batal</x-ui.button>
                 </div>
             </form>
         </x-ui.card>

@@ -122,7 +122,7 @@ class BarangController extends Controller
                     'max:255',
                     Rule::unique($targetTable, 'nama'),
                 ],
-                'satuan' => 'required|in:cm,inch',
+                'satuan' => 'required|in:mm,inch',
                 'stok_minimum' => 'required|integer|min:0',
                 'ukuran' => [
                     'required',
@@ -138,7 +138,7 @@ class BarangController extends Controller
                     'max:255',
                     Rule::unique($targetTable, 'nama'),
                 ],
-                'satuan' => 'required|in:cm,inch',
+                'satuan' => 'required|in:mm,inch',
                 'ukuran' => [
                     'required',
                     'string',
@@ -192,7 +192,7 @@ class BarangController extends Controller
 
     public function update(Request $request, string $barang)
     {
-        $formMode = $this->resolveFormMode($request, $request->routeIs('material.*') ? 'material' : 'produk');
+        $formMode = $this->resolveFormMode($request, $request->routeIs('data-material.*') ? 'material' : 'produk');
         $barangModel = $this->findBarangByMode($formMode, $barang);
         $targetTable = $formMode === 'material' ? 'materials' : 'products';
 
@@ -204,8 +204,7 @@ class BarangController extends Controller
                     'max:255',
                     Rule::unique($targetTable, 'nama')->ignore($barangModel->getKey(), $barangModel->getKeyName()),
                 ],
-                'id_jenis_barang' => 'required|exists:jenis_barang,id_jenis_barang',
-                'satuan' => 'required|in:cm,inch',
+                'satuan' => 'required|in:mm,inch',
                 'stok_minimum' => 'required|integer|min:0',
                 'ukuran' => [
                     'required',
@@ -221,7 +220,7 @@ class BarangController extends Controller
                     'max:255',
                     Rule::unique($targetTable, 'nama')->ignore($barangModel->getKey(), $barangModel->getKeyName()),
                 ],
-                'satuan' => 'required|in:cm,inch',
+                'satuan' => 'required|in:mm,inch',
                 'ukuran' => [
                     'required',
                     'string',

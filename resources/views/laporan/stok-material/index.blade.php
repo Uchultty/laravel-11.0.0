@@ -19,11 +19,37 @@
             </x-ui.card>
         </div>
 
+        <x-ui.card bodyClass="p-4">
+            <form method="GET" action="{{ request()->url() }}" class="flex flex-col gap-3 md:flex-row md:items-end">
+                <div class="flex-1">
+                    <label for="q" class="ui-label">Cari nama barang</label>
+                    <input
+                        type="text"
+                        id="q"
+                        name="q"
+                        value="{{ $search ?? '' }}"
+                        placeholder="Cari nama barang"
+                        class="ui-input uppercase"
+                        autocomplete="off"
+                        spellcheck="false"
+                        oninput="this.value = this.value.toUpperCase()"
+                    >
+                </div>
+                <div class="flex gap-3">
+                    <x-ui.button type="submit">Cari</x-ui.button>
+                    @if(!empty($search))
+                        <x-ui.button :href="request()->url()" variant="secondary">Reset</x-ui.button>
+                    @endif
+                </div>
+            </form>
+        </x-ui.card>
+
         <x-ui.card bodyClass="p-0">
             <x-ui.table>
                 <thead>
                     <tr>
                         <th class="text-left">Nama Barang</th>
+                        <th class="text-left">Ukuran</th>
                         <th class="text-left">Jenis</th>
                         <th class="text-left">Stok Saat Ini</th>
                     </tr>
@@ -32,12 +58,13 @@
                     @forelse ($barangs as $barang)
                         <tr>
                             <td class="align-middle text-left text-sm font-semibold text-ink-800">{{ $barang->nama }}</td>
+                            <td class="align-middle text-left text-sm text-ink-700">{{ filled($barang->ukuran) ? $barang->ukuran : '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ optional($barang->jenisBarang)->nama ?? '-' }}</td>
                             <td class="align-middle text-left text-sm text-ink-700">{{ number_format((int) $barang->quantity, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada data material.</td>
+                            <td colspan="4" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada data material.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -32,16 +32,16 @@
 
                 <div>
                     <label for="satuan" class="ui-label">Satuan</label>
-                    <input type="hidden" id="satuan" name="satuan" value="cm">
+                    <input type="hidden" id="satuan" name="satuan" value="mm">
                     <div class="mt-2 rounded-lg border border-sand-200 bg-sand-50 px-4 py-3 text-sm font-semibold text-ink-800">
-                        CM
+                        MM
                     </div>
                     @error('satuan') <p class="ui-error">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label for="ukuran" class="ui-label">Ukuran</label>
-                    <x-ui.input type="text" name="ukuran" id="ukuran" placeholder="Contoh: 5 cm / 5x5 cm / 244x122x1.2 cm" value="{{ old('ukuran', $barangDalamProses->ukuran ?? '') }}" required />
+                    <x-ui.input type="text" name="ukuran" id="ukuran" placeholder="Contoh: 5 mm / 5x5 mm / 244x122x1.2 mm" value="{{ old('ukuran', $barangDalamProses->ukuran ?? '') }}" required />
                     @error('ukuran') <p class="ui-error">{{ $message }}</p> @enderror
                 </div>
 

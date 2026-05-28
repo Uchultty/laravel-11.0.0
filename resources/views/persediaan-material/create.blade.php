@@ -46,9 +46,9 @@
                     <!-- Satuan -->
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Satuan *</label>
-                        <input type="hidden" name="satuan" value="CM">
+                        <input type="hidden" name="satuan" value="MM">
                         <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
-                            CM
+                            MM
                         </div>
                         @error('satuan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -102,21 +102,11 @@
                         <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, PDF (Max 5MB)</p>
                         @error('invoice_gambar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
-
-
                 </div>
 
-                <!-- Buttons -->
-                <div class="flex gap-3">
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-white font-medium hover:bg-blue-600 transition-colors">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Simpan
-                    </button>
-                    <a href="{{ route('persediaan-material.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-slate-500 px-4 py-2 text-white font-medium hover:bg-slate-600 transition-colors">
-                        Batal
-                    </a>
+                <div class="ui-actions">
+                    <x-ui.button type="submit">Simpan</x-ui.button>
+                    <x-ui.button :href="route('persediaan-material.index')" variant="secondary">Batal</x-ui.button>
                 </div>
             </form>
         </x-ui.card>

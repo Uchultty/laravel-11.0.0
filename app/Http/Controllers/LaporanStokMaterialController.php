@@ -3,18 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LaporanStokMaterialController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $stokMinimumBatas = 10;
+        $search = trim((string) $request->query('q', ''));
 
         $query = Material::query()
             ->with(['jenisBarang:id_jenis_barang,nama'])
             ->select('materials.*')
             ->latest('created_at');
+
+        if ($search !== '') {
+            $searchLike = '%' . mb_strtoupper($search) . '%';
+
+            $query->whereRaw('UPPER(nama) LIKE ?', [$searchLike]);
+        }
 
         $summaryTotalItem = (clone $query)->count();
         $summaryTotalStok = (int) (clone $query)->sum('quantity');
@@ -30,6 +38,7 @@ class LaporanStokMaterialController extends Controller
             'summaryTotalStok' => $summaryTotalStok,
             'summaryStokMenipis' => $summaryStokMenipis,
             'stokMinimumBatas' => $stokMinimumBatas,
+            'search' => $search,
         ]);
     }
 }
