@@ -46,33 +46,62 @@
             </form>
         </x-ui.card>
 
-        <x-ui.card bodyClass="p-0">
-            <x-ui.table>
-                <thead>
-                    <tr>
-                        <th class="text-left">Nama Barang</th>
-                        <th class="text-left">Ukuran</th>
-                        <th class="text-left">Jenis</th>
-                        <th class="text-left">Stok Saat Ini</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($barangs as $barang)
+        <x-ui.card class="overflow-hidden" style="height: clamp(560px, 72vh, 760px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
+            <div class="border-b border-ink-100 p-4">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Daftar Material</p>
+                        <p class="text-xs text-slate-500">Tampilan mengikuti sistem scroll internal pada data material.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <x-ui.table class="compact-scroll-table">
+                    <thead>
                         <tr>
-                            <!-- Nama dan ukuran dipisah supaya informasi barang lebih mudah dibaca. -->
-                            <td class="align-middle text-left text-sm font-semibold text-ink-800">{{ $barang->nama }}</td>
-                            <td class="align-middle text-left text-sm text-ink-700">{{ filled($barang->ukuran) ? $barang->ukuran : '-' }}</td>
-                            <td class="align-middle text-left text-sm text-ink-700">{{ optional($barang->jenisBarang)->nama ?? '-' }}</td>
-                            <td class="align-middle text-left text-sm text-ink-700">{{ number_format((int) $barang->quantity, 0, ',', '.') }}</td>
+                            <th class="text-left">Nama Barang</th>
+                            <th class="text-left">Ukuran</th>
+                            <th class="text-left">Jenis</th>
+                            <th class="text-left">Stok Saat Ini</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada data material.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </x-ui.table>
-            <div class="border-t border-ink-100 p-4">{{ $barangs->links() }}</div>
+                    </thead>
+                    <tbody>
+                        @forelse ($barangs as $barang)
+                            <tr>
+                                <!-- Nama dan ukuran dipisah supaya informasi barang lebih mudah dibaca. -->
+                                <td class="align-middle text-left text-sm font-semibold text-ink-800">{{ $barang->nama }}</td>
+                                <td class="align-middle text-left text-sm text-ink-700">{{ filled($barang->ukuran) ? $barang->ukuran : '-' }}</td>
+                                <td class="align-middle text-left text-sm text-ink-700">{{ optional($barang->jenisBarang)->nama ?? '-' }}</td>
+                                <td class="align-middle text-left text-sm text-ink-700">{{ number_format((int) $barang->quantity, 0, ',', '.') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada data material.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </x-ui.table>
+            </div>
         </x-ui.card>
     </div>
 </x-app-layout>
+
+<style>
+.compact-scroll-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f8fafc;
+}
+
+.compact-scroll-table th,
+.compact-scroll-table td {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+}
+
+.compact-scroll-table tbody tr {
+    height: 50px;
+}
+</style>

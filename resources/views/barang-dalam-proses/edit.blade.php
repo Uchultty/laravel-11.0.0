@@ -115,6 +115,7 @@
             if (ukuran) {
                 ukuranInput.value = ukuran;
             }
+            filterMaterialsForSelectedProduct();
         }
 
         function validateMaterialStock() {
@@ -155,4 +156,63 @@
 
             validateMaterialStock();
         });
+
+        // Build product->materials map and filter material options when product changes
+        (function () {
+            const productMaterials = @json(\App\Models\Product::with('materials:id_material')->get()->map(function($p) {
+                return [
+                    'id' => $p->id_product,
+                    'materials' => $p->materials->pluck('id_material')->all(),
+                ];
+            }));
+
+            window.__productMaterialsMap = {};
+            productMaterials.forEach(function(item) {
+                window.__productMaterialsMap[item.id] = item.materials;
+            });
+
+            const materialSelect = document.getElementById('id_barang_mentah');
+            window.__originalMaterialOptions = {};
+            Array.from(materialSelect.options).forEach(function(opt) {
+                if (!opt.value) return;
+                window.__originalMaterialOptions[opt.value] = opt.outerHTML;
+            });
+
+            window.filterMaterialsForSelectedProduct = function() {
+                const prodSelect = document.getElementById('id_barang');
+                const matSelect = document.getElementById('id_barang_mentah');
+                const selectedProduct = prodSelect.value;
+
+                const placeholder = Array.from(matSelect.options).find(o => !o.value);
+                const placeholderHtml = placeholder ? placeholder.outerHTML : '<option value="" disabled selected>Pilih Material</option>';
+
+                if (!selectedProduct) {
+                    let html = placeholderHtml + Object.values(window.__originalMaterialOptions).join('');
+                    matSelect.innerHTML = html;
+                    validateMaterialStock();
+                    return;
+                }
+
+                const allowed = window.__productMaterialsMap[selectedProduct] || [];
+                let html = placeholderHtml;
+
+                allowed.forEach(function(mid) {
+                    const optHtml = window.__originalMaterialOptions[mid];
+                    if (optHtml) html += optHtml;
+                });
+
+                // Preserve previously selected material if still allowed
+                const prev = matSelect.value;
+                matSelect.innerHTML = html;
+                if (prev && allowed.includes(prev)) {
+                    matSelect.value = prev;
+                }
+
+                validateMaterialStock();
+            };
+
+            document.addEventListener('DOMContentLoaded', function() {
+                filterMaterialsForSelectedProduct();
+            });
+        })();
     </script>

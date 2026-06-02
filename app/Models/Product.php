@@ -39,4 +39,10 @@ class Product extends Model
     {
         return $this->belongsTo(JenisBarang::class, 'id_jenis_barang', 'id_jenis_barang');
     }
+
+    public function materials()
+    {
+        return $this->belongsToMany(Material::class, 'product_material', 'id_product', 'id_material')
+            ->withTimestamps();
+    }
 }

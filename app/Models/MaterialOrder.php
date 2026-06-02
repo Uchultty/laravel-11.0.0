@@ -31,6 +31,7 @@ class MaterialOrder extends Model
     protected $casts = [
         'tgl_pemesanan' => 'date',
         'estimasi_tiba' => 'date',
+        'detail_materials' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

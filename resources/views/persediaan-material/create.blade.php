@@ -16,26 +16,77 @@
                 <div class="border-b pb-6">
                     <h3 class="text-lg font-semibold text-slate-900 mb-4">Informasi Persediaan</h3>
 
-                    <!-- Nama Material -->
-                    <div>
-                        <label for="source_barang_id" class="block text-sm font-medium text-slate-700 mb-1">Nama Material *</label>
-                        <select id="source_barang_id" name="source_barang_id" required class="w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('source_barang_id') border-red-500 @enderror">
-                            <option value="">Pilih Material</option>
-                            @foreach($materials as $material)
-                                <option value="{{ $material->source_barang_id }}" {{ old('source_barang_id') == $material->source_barang_id ? 'selected' : '' }}>
-                                    {{ filled($material->ukuran) ? $material->nama . ' - ' . $material->ukuran : $material->nama . ' (' . $material->kode . ')' }}
-                                </option>
+                    @php
+                        $detailRows = old('detail_materials', [['source_barang_id' => '', 'quantity' => '']]);
+                    @endphp
+
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Daftar Material</p>
+                                <p class="text-xs text-slate-500">Tambahkan material lebih dari satu, lalu hapus baris yang tidak jadi dipakai.</p>
+                            </div>
+                            <button type="button" id="addDetailRow" class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700">
+                                + Tambah Material
+                            </button>
+                        </div>
+
+                        <div id="detailRows" class="space-y-3">
+                            @foreach ($detailRows as $index => $row)
+                                <div class="detail-row grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-3 md:grid-cols-[minmax(0,1fr)_160px_auto] md:items-end">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1" for="detail_materials_{{ $index }}_source_barang_id">Nama Material *</label>
+                                        <select id="detail_materials_{{ $index }}_source_barang_id" name="detail_materials[{{ $index }}][source_barang_id]" required class="detail-material-select w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('detail_materials.' . $index . '.source_barang_id') border-red-500 @enderror">
+                                            <option value="">Pilih Material</option>
+                                            @foreach($materials as $material)
+                                                <option value="{{ $material->source_barang_id }}" {{ (string) ($row['source_barang_id'] ?? '') === (string) $material->source_barang_id ? 'selected' : '' }}>
+                                                    {{ filled($material->ukuran) ? $material->nama . ' - ' . $material->ukuran : $material->nama . ' (' . $material->kode . ')' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('detail_materials.' . $index . '.source_barang_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1" for="detail_materials_{{ $index }}_quantity">QTY *</label>
+                                        <input type="number" id="detail_materials_{{ $index }}_quantity" name="detail_materials[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? '' }}" min="1" required class="detail-qty w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('detail_materials.' . $index . '.quantity') border-red-500 @enderror">
+                                        @error('detail_materials.' . $index . '.quantity') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <button type="button" class="remove-detail-row inline-flex h-11 items-center justify-center rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-600 hover:bg-red-50 md:self-end">
+                                        ✕
+                                    </button>
+                                </div>
                             @endforeach
-                        </select>
-                        @error('source_barang_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        @error('detail_materials') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <!-- QTY -->
-                    <div class="mt-4">
-                        <label for="quantity" class="block text-sm font-medium text-slate-700 mb-1">QTY *</label>
-                        <input type="number" id="quantity" name="quantity" value="{{ old('quantity') }}" min="1" required class="w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('quantity') border-red-500 @enderror">
-                        @error('quantity') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
+                    <template id="detailRowTemplate">
+                        <div class="detail-row grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-3 md:grid-cols-[minmax(0,1fr)_160px_auto] md:items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Material *</label>
+                                <select required class="detail-material-select w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                                    <option value="">Pilih Material</option>
+                                    @foreach($materials as $material)
+                                        <option value="{{ $material->source_barang_id }}">
+                                            {{ filled($material->ukuran) ? $material->nama . ' - ' . $material->ukuran : $material->nama . ' (' . $material->kode . ')' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">QTY *</label>
+                                <input type="number" min="1" required class="detail-qty w-full h-11 rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                            </div>
+
+                            <button type="button" class="remove-detail-row inline-flex h-11 items-center justify-center rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-600 hover:bg-red-50 md:self-end">
+                                ✕
+                            </button>
+                        </div>
+                    </template>
 
                     <div class="mt-4">
                         <label for="no_po" class="block text-sm font-medium text-slate-700 mb-1">No PO</label>
@@ -111,4 +162,80 @@
             </form>
         </x-ui.card>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rowsContainer = document.getElementById('detailRows');
+            const addButton = document.getElementById('addDetailRow');
+            const template = document.getElementById('detailRowTemplate');
+
+            if (!rowsContainer || !addButton || !template) {
+                return;
+            }
+
+            const syncRows = () => {
+                const rows = rowsContainer.querySelectorAll('.detail-row');
+
+                rows.forEach((row, index) => {
+                    const select = row.querySelector('.detail-material-select');
+                    const qty = row.querySelector('.detail-qty');
+                    const label = row.querySelector('label[for]');
+
+                    if (select) {
+                        select.name = `detail_materials[${index}][source_barang_id]`;
+                        select.id = `detail_materials_${index}_source_barang_id`;
+                    }
+
+                    if (qty) {
+                        qty.name = `detail_materials[${index}][quantity]`;
+                        qty.id = `detail_materials_${index}_quantity`;
+                    }
+
+                    if (label && select) {
+                        label.setAttribute('for', select.id);
+                    }
+                });
+            };
+
+            addButton.addEventListener('click', () => {
+                const row = template.content.firstElementChild.cloneNode(true);
+                rowsContainer.appendChild(row);
+                syncRows();
+            });
+
+            rowsContainer.addEventListener('click', (event) => {
+                const removeButton = event.target.closest('.remove-detail-row');
+
+                if (!removeButton) {
+                    return;
+                }
+
+                const rowCount = rowsContainer.querySelectorAll('.detail-row').length;
+
+                if (rowCount === 1) {
+                    const firstRow = rowsContainer.querySelector('.detail-row');
+
+                    if (firstRow) {
+                        const select = firstRow.querySelector('.detail-material-select');
+                        const qty = firstRow.querySelector('.detail-qty');
+
+                        if (select) {
+                            select.value = '';
+                        }
+
+                        if (qty) {
+                            qty.value = '';
+                        }
+                    }
+
+                    return;
+                }
+
+                removeButton.closest('.detail-row')?.remove();
+                syncRows();
+            });
+
+            syncRows();
+        });
+    </script>
 </x-app-layout>

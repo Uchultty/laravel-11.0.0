@@ -8,6 +8,7 @@ use App\Models\MaterialOrder;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class BarangMasukController extends Controller
@@ -176,10 +177,26 @@ class BarangMasukController extends Controller
             Storage::disk('public')->delete($barangMasuk->invoice_path);
         }
 
-        // Kurangi quantity dari material sebelum menghapus
-        $material = Material::findOrFail($barangMasuk->id_material);
-        $material->quantity = max(0, ($material->quantity ?? 0) - $barangMasuk->qty);
-        $material->save();
+        $detailMaterials = collect($barangMasuk->detail_materials ?? []);
+
+        if ($detailMaterials->isNotEmpty()) {
+            foreach ($detailMaterials as $detail) {
+                $material = Material::find($detail['id_material'] ?? null);
+
+                if (! $material) {
+                    continue;
+                }
+
+                $quantity = (int) ($detail['quantity'] ?? 0);
+                $material->quantity = max(0, ($material->quantity ?? 0) - $quantity);
+                $material->save();
+            }
+        } else {
+            // Kurangi quantity dari material sebelum menghapus
+            $material = Material::findOrFail($barangMasuk->id_material);
+            $material->quantity = max(0, ($material->quantity ?? 0) - $barangMasuk->qty);
+            $material->save();
+        }
 
         $barangMasuk->delete();
 
@@ -206,7 +223,9 @@ class BarangMasukController extends Controller
         })
         ->orWhereHas('supplier', function ($q3) use ($search) {
             $q3->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"]);
-        });
+        })
+        // Also search inside JSON detail_materials for material names
+        ->orWhereRaw("LOWER(COALESCE(detail_materials::text, '')) LIKE ?", ["%{$search}%"]);
     });
 }
 
@@ -236,8 +255,9 @@ class BarangMasukController extends Controller
     public function persediaanMaterialStore(Request $request)
     {
         $validated = $request->validate([
-            'source_barang_id' => 'required|exists:materials,source_barang_id',
-            'quantity' => 'required|integer|min:1',
+            'detail_materials' => 'required|array|min:1',
+            'detail_materials.*.source_barang_id' => 'required|exists:materials,source_barang_id',
+            'detail_materials.*.quantity' => 'required|integer|min:1',
             'satuan' => 'required|in:INCH,MM',
             'tanggal_masuk' => 'required|date',
             'estimasi_tiba_display' => 'nullable|date',
@@ -246,13 +266,29 @@ class BarangMasukController extends Controller
             'invoice_gambar' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
         ]);
 
-        $material = Material::query()
-            ->where('source_barang_id', $validated['source_barang_id'])
-            ->firstOrFail();
+        $detailMaterials = collect($validated['detail_materials'])
+            ->map(function (array $detail) {
+                $material = Material::query()
+                    ->where('source_barang_id', $detail['source_barang_id'])
+                    ->firstOrFail();
+
+                return [
+                    'id_material' => $material->id_material,
+                    'source_barang_id' => $material->source_barang_id,
+                    'nama' => $material->nama,
+                    'ukuran' => $material->ukuran,
+                    'quantity' => (int) $detail['quantity'],
+                ];
+            })
+            ->values();
+
+        $totalQuantity = $detailMaterials->sum('quantity');
+        $primaryMaterial = $detailMaterials->first();
 
         $data = [
-            'id_material' => $material->id_material,
-            'qty' => $validated['quantity'],
+            'id_material' => $primaryMaterial['id_material'] ?? null,
+            'qty' => $totalQuantity,
+            'detail_materials' => $detailMaterials->all(),
             'satuan' => $validated['satuan'],
             'tgl_pemesanan' => $validated['tanggal_masuk'],
             'estimasi_tiba' => $validated['estimasi_tiba_display'] ?? null,
@@ -269,26 +305,30 @@ class BarangMasukController extends Controller
             $data['invoice_path'] = $request->file('invoice_gambar')->store('persediaan-material/invoice', 'public');
         }
 
-        $created = false;
-        $attempt = 0;
+        DB::transaction(function () use (&$data, $detailMaterials, $validated) {
+            $created = false;
+            $attempt = 0;
 
-        while (! $created && $attempt < 5) {
-            $attempt++;
-            $data['no_po'] = $this->generateNextNoPo($validated['tanggal_masuk']);
+            while (! $created && $attempt < 5) {
+                $attempt++;
+                $data['no_po'] = $this->generateNextNoPo($validated['tanggal_masuk']);
 
-            try {
-                MaterialOrder::create($data);
-                $created = true;
-            } catch (QueryException $exception) {
-                if (! $this->isNoPoUniqueViolation($exception) || $attempt >= 5) {
-                    throw $exception;
+                try {
+                    MaterialOrder::create($data);
+                    $created = true;
+                } catch (QueryException $exception) {
+                    if (! $this->isNoPoUniqueViolation($exception) || $attempt >= 5) {
+                        throw $exception;
+                    }
                 }
             }
-        }
 
-        // Stok material ditambah setelah order berhasil dibuat agar data persediaan tetap sinkron.
-        $material->increment('quantity', $validated['quantity']);
-        $material->update(['satuan' => $validated['satuan']]);
+            foreach ($detailMaterials as $detail) {
+                $material = Material::findOrFail($detail['id_material']);
+                $material->increment('quantity', (int) $detail['quantity']);
+                $material->update(['satuan' => $validated['satuan']]);
+            }
+        });
 
         return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil ditambahkan');
     }
@@ -313,8 +353,9 @@ class BarangMasukController extends Controller
     public function persediaanMaterialUpdate(Request $request, MaterialOrder $barangMasuk)
     {
         $validated = $request->validate([
-            'source_barang_id' => 'required|exists:materials,source_barang_id',
-            'quantity' => 'required|integer|min:1',
+            'detail_materials' => 'required|array|min:1',
+            'detail_materials.*.source_barang_id' => 'required|exists:materials,source_barang_id',
+            'detail_materials.*.quantity' => 'required|integer|min:1',
             'satuan' => 'required|in:INCH,MM',
             'tanggal_masuk' => 'required|date',
             'estimasi_tiba_display' => 'nullable|date',
@@ -323,15 +364,40 @@ class BarangMasukController extends Controller
             'invoice_gambar' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
         ]);
 
-        $material = Material::query()
-            ->where('source_barang_id', $validated['source_barang_id'])
-            ->firstOrFail();
+        // Map incoming details to material IDs
+        $newDetails = collect($validated['detail_materials'])
+            ->map(function (array $detail) {
+                $material = Material::query()
+                    ->where('source_barang_id', $detail['source_barang_id'])
+                    ->firstOrFail();
 
-        // Simpan file lama supaya file yang tidak diganti tetap aman.
+                return [
+                    'id_material' => $material->id_material,
+                    'source_barang_id' => $material->source_barang_id,
+                    'nama' => $material->nama,
+                    'ukuran' => $material->ukuran,
+                    'quantity' => (int) $detail['quantity'],
+                ];
+            })
+            ->values();
+
+        $totalQuantity = $newDetails->sum('quantity');
+        $primaryMaterial = $newDetails->first();
+
+        // Save old details for stock adjustment
+        $oldDetails = collect($barangMasuk->detail_materials ?? []);
+
+        if ($oldDetails->isEmpty()) {
+            $oldDetails = collect([[
+                'id_material' => $barangMasuk->id_material,
+                'quantity' => $barangMasuk->qty,
+            ]]);
+        }
+
+        // File handling: keep references to old files
         $oldSuratJalan = $barangMasuk->surat_jalan_path;
         $oldInvoice = $barangMasuk->invoice_path;
 
-        // Upload file baru hanya kalau user memilih file pengganti.
         if ($request->hasFile('surat_jalan_path')) {
             $newSuratJalan = $request->file('surat_jalan_path')->store('persediaan-material/surat-jalan', 'public');
         }
@@ -340,47 +406,51 @@ class BarangMasukController extends Controller
             $newInvoice = $request->file('invoice_gambar')->store('persediaan-material/invoice', 'public');
         }
 
-        // Selisih quantity dipakai untuk menyesuaikan stok material lama dan baru.
-        $quantityDifference = $validated['quantity'] - $barangMasuk->qty;
-        $oldMaterialId = $barangMasuk->id_material;
-
-        // Update header transaksi dulu, lalu stok materialnya disesuaikan.
-        $barangMasuk->id_material = $material->id_material;
-        $barangMasuk->qty = $validated['quantity'];
+        // Update header
+        $barangMasuk->id_material = $primaryMaterial['id_material'] ?? null;
+        $barangMasuk->qty = $totalQuantity;
+        $barangMasuk->detail_materials = $newDetails->all();
         $barangMasuk->satuan = $validated['satuan'];
         $barangMasuk->tgl_pemesanan = $validated['tanggal_masuk'];
         $barangMasuk->estimasi_tiba = $validated['estimasi_tiba_display'] ?? null;
         $barangMasuk->id_supplier = $validated['id_supplier'];
 
-        if ($request->hasFile('surat_jalan_path')) {
+        if (isset($newSuratJalan)) {
             $barangMasuk->surat_jalan_path = $newSuratJalan;
         }
 
-        if ($request->hasFile('invoice_gambar')) {
+        if (isset($newInvoice)) {
             $barangMasuk->invoice_path = $newInvoice;
         }
 
-        // Simpan transaksi utama lebih dulu supaya perubahan data tercatat.
         $barangMasuk->save();
 
-        // Sesuaikan stok material sesuai hasil update transaksi.
-        if ($oldMaterialId === $material->id_material) {
-            // Material tetap sama, jadi cukup hitung selisih quantity.
-            $material->quantity = ($material->quantity ?? 0) + $quantityDifference;
-            $material->satuan = $validated['satuan'];
-            $material->save();
-        } else {
-            // Material berubah, stok lama dikurangi dan stok baru ditambah.
-            $oldMaterial = Material::findOrFail($oldMaterialId);
-            $oldMaterial->quantity = max(0, ($oldMaterial->quantity ?? 0) - $barangMasuk->getOriginal('qty'));
-            $oldMaterial->save();
+        // Compute deltas per material id and apply to stocks
+        $oldMap = $oldDetails->groupBy('id_material')->map(fn($g) => array_sum(array_column($g->toArray(), 'quantity')))->toArray();
+        $newMap = $newDetails->groupBy('id_material')->map(fn($g) => array_sum(array_column($g->toArray(), 'quantity')))->toArray();
 
-            $material->quantity = ($material->quantity ?? 0) + $validated['quantity'];
-            $material->satuan = $validated['satuan'];
-            $material->save();
+        $allIds = array_unique(array_merge(array_keys($oldMap), array_keys($newMap)));
+
+        foreach ($allIds as $matId) {
+            $oldQty = (int) ($oldMap[$matId] ?? 0);
+            $newQty = (int) ($newMap[$matId] ?? 0);
+            $delta = $newQty - $oldQty;
+
+            $material = Material::find($matId);
+            if (! $material) continue;
+
+            if ($delta > 0) {
+                $material->increment('quantity', $delta);
+            } elseif ($delta < 0) {
+                $material->quantity = max(0, ($material->quantity ?? 0) + $delta);
+                $material->save();
+            }
+
+            // keep satuan in sync for affected materials
+            $material->update(['satuan' => $validated['satuan']]);
         }
 
-        // Baru hapus file lama SETELAH save berhasil
+        // Delete old files after successful save
         if ($request->hasFile('surat_jalan_path') && $oldSuratJalan) {
             Storage::disk('public')->delete($oldSuratJalan);
         }
@@ -389,8 +459,7 @@ class BarangMasukController extends Controller
             Storage::disk('public')->delete($oldInvoice);
         }
 
-        return redirect()->route('persediaan-material.index')
-            ->with('success', 'Persediaan material berhasil diperbarui');
+        return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil diperbarui');
     }
 
     private function resolveDefaultEstimasiTiba(): string

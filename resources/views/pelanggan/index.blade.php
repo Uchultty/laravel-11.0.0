@@ -18,7 +18,7 @@
             <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $message }}</div>
         @endif
 
-        <x-ui.card bodyClass="p-0">
+        <x-ui.card class="overflow-hidden" style="height: clamp(540px, 70vh, 740px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
             <div class="border-b border-ink-100 p-4">
                 <form method="GET" action="{{ route('pelanggan.index') }}" class="flex gap-2">
                     <input type="text" name="q" placeholder="Cari nama pelanggan..." value="{{ $search }}" class="flex-1 px-3 py-2 border border-ink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sand-500" />
@@ -28,66 +28,67 @@
                     @endif
                 </form>
             </div>
-            <x-ui.table>
-                <thead>
-                    <tr>
-                        <th>Nama Pelanggan</th>
-                        <th>Jabatan</th>
-                        <th>Alamat</th>
-                        <th>Kontak</th>
-                        <th>Email</th>
-                        <th class="w-44 whitespace-nowrap text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($customers as $customer)
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <x-ui.table class="compact-scroll-table">
+                    <thead>
                         <tr>
-                            <td class="font-semibold text-ink-800">{{ $customer->nama }}</td>
-                            <td>{{ $customer->jabatan ? mb_strtoupper($customer->jabatan) : '-' }}</td>
-                            <td>{{ $customer->alamat ?: '-' }}</td>
-                            <td>{{ $customer->kontak ?: '-' }}</td>
-                            <td>{{ $customer->email ?: '-' }}</td>
-                            <td class="w-44 align-middle text-center">
-                                <div class="flex flex-wrap items-center justify-center gap-2 whitespace-nowrap">
-                                    <x-ui.button
-                                        :href="route('pelanggan.edit', ['pelanggan' => $customer])"
-                                        variant="secondary"
-                                        class="px-3 py-2 text-xs whitespace-nowrap"
-                                    >
-                                        Edit
-                                    </x-ui.button>
-
-                                    <form
-                                        id="deleteForm{{ $customer->id_pelanggan }}"
-                                        action="{{ route('pelanggan.destroy', $customer) }}"
-                                        method="POST"
-                                        class="inline"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-
+                            <th>Nama Pelanggan</th>
+                            <th>Jabatan</th>
+                            <th>Alamat</th>
+                            <th>Kontak</th>
+                            <th>Email</th>
+                            <th class="w-44 whitespace-nowrap text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($customers as $customer)
+                            <tr>
+                                <td class="font-semibold text-ink-800">{{ $customer->nama }}</td>
+                                <td>{{ $customer->jabatan ? mb_strtoupper($customer->jabatan) : '-' }}</td>
+                                <td>{{ $customer->alamat ?: '-' }}</td>
+                                <td>{{ $customer->kontak ?: '-' }}</td>
+                                <td>{{ $customer->email ?: '-' }}</td>
+                                <td class="w-44 align-middle text-center">
+                                    <div class="flex flex-wrap items-center justify-center gap-2 whitespace-nowrap">
                                         <x-ui.button
-                                            type="button"
-                                            variant="danger"
+                                            :href="route('pelanggan.edit', ['pelanggan' => $customer])"
+                                            variant="secondary"
                                             class="px-3 py-2 text-xs whitespace-nowrap"
-                                            onclick="confirmDelete(event, '{{ $customer->id_pelanggan }}', '{{ $customer->nama }}')"
                                         >
-                                            Hapus
+                                            Edit
                                         </x-ui.button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-sm text-ink-500">
-                                Tidak ada data
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </x-ui.table>
-            <div class="border-t border-ink-100 p-4">{{ $customers->links() }}</div>
+
+                                        <form
+                                            id="deleteForm{{ $customer->id_pelanggan }}"
+                                            action="{{ route('pelanggan.destroy', $customer) }}"
+                                            method="POST"
+                                            class="inline"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <x-ui.button
+                                                type="button"
+                                                variant="danger"
+                                                class="px-3 py-2 text-xs whitespace-nowrap"
+                                                onclick="confirmDelete(event, '{{ $customer->id_pelanggan }}', '{{ $customer->nama }}')"
+                                            >
+                                                Hapus
+                                            </x-ui.button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-sm text-ink-500">
+                                    Tidak ada data
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </x-ui.table>
+            </div>
         </x-ui.card>
     </div>
 
@@ -116,6 +117,25 @@
         };
     }
     </script>
+
+    <style>
+    .compact-scroll-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+    }
+
+    .compact-scroll-table th,
+    .compact-scroll-table td {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .compact-scroll-table tbody tr {
+        height: 50px;
+    }
+    </style>
 
     <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
         <div class="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-2xl">

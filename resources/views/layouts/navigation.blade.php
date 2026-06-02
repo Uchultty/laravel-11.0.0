@@ -15,20 +15,20 @@
     </div>
 
     <!-- User Info -->
-    <div class="border-b border-blue-100 px-6 py-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
-        <div class="flex items-center gap-3 rounded-lg bg-blue-100/40 px-4 py-3 border border-blue-100/60" :class="sidebarCollapsed ? 'lg:justify-center lg:px-3' : ''">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 text-xs font-bold text-white shadow-md">
+    <div class="border-b border-blue-100 px-5 py-3 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+        <div class="flex items-center gap-2.5 rounded-lg bg-blue-100/40 px-3 py-2.5 border border-blue-100/60" :class="sidebarCollapsed ? 'lg:justify-center lg:px-2.5' : ''">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 text-[11px] font-bold text-white shadow-md">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1" x-cloak x-show="!sidebarCollapsed">
-                <p class="truncate text-sm font-semibold text-slate-900">{{ Auth::user()->name }}</p>
+                <p class="truncate text-xs font-semibold text-slate-900">{{ Auth::user()->name }}</p>
             </div>
         </div>
     </div>
 
     <!-- Main Menu -->
     <!-- Removed flex-1 so footer (Keluar) appears directly after menu instead of being pushed to the bottom -->
-    <div class="overflow-y-auto px-4 py-6">
+    <div id="sidebar-scroll-area" class="overflow-y-auto px-4 py-6">
         @php
             $mainMenuClasses = 'group relative mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200';
             $mainMenuActive = 'bg-blue-500/15 text-blue-600 border-l-2 border-blue-500 pl-2.5';
@@ -57,6 +57,16 @@
             $persediaanSubmenuClasses = 'group relative mt-1 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all duration-200';
             $persediaanSubmenuActive = 'bg-blue-500/10 text-blue-600';
             $persediaanSubmenuInactive = 'text-slate-600 hover:text-blue-600 hover:bg-blue-50';
+            $lowStockCount = 0;
+            try {
+                if (! app()->runningInConsole()) {
+                    $lowStockCount = \App\Models\Material::query()
+                        ->whereColumn('stok_saat_ini', '<=', 'stok_minimum')
+                        ->count();
+                }
+            } catch (\Throwable $e) {
+                $lowStockCount = 0;
+            }
         @endphp
 
         <div>
@@ -105,9 +115,11 @@
                     </svg>
                     <span x-cloak x-show="!sidebarCollapsed" class="flex items-center gap-2">
                         <span>Data Material</span>
-                        <span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm ring-2 ring-white">
-                            !
-                        </span>
+                        @if($lowStockCount > 0)
+                            <span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm ring-2 ring-white" aria-label="{{ $lowStockCount }} material stok rendah">
+                                {{ $lowStockCount > 99 ? '99+' : $lowStockCount }}
+                            </span>
+                        @endif
                     </span>
                     @if(request()->routeIs('data-material.*'))
                             <div class="absolute inset-y-0 right-0 w-1 rounded-r-lg bg-blue-500"></div>

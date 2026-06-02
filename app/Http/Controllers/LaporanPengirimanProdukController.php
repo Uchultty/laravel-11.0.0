@@ -14,7 +14,7 @@ class LaporanPengirimanProdukController extends Controller
     {
         $query = $this->buildQuery($request, true);
         $summaryTotalItem = (clone $query)->count();
-        $pengirimanCompletedPaginated = $query->paginate(10)->withQueryString();
+        $pengirimanCompletedPaginated = $query->get();
 
         return view('laporan.pengiriman-produk.index', [
             'pengirimanCompletedPaginated' => $pengirimanCompletedPaginated,

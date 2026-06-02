@@ -12,6 +12,15 @@
             @php
                 $displayTanggal = optional($barangMasuk->tgl_pemesanan)->format('d/m/Y') ?? '-';
                 $displayEstimasi = optional($barangMasuk->estimasi_tiba)->format('d/m/Y') ?? '-';
+                $detailMaterials = collect($barangMasuk->detail_materials ?? []);
+                $displayDetails = $detailMaterials->isNotEmpty()
+                    ? $detailMaterials
+                    : collect([
+                        [
+                            'nama' => optional($barangMasuk->material)->nama,
+                            'quantity' => $barangMasuk->qty,
+                        ],
+                    ]);
             @endphp
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -25,11 +34,19 @@
                 </div>
                 <div>
                     <p class="ui-label">Nama Material</p>
-                    <p class="text-sm text-ink-900">{{ optional($barangMasuk->material)->nama ?? '-' }}</p>
+                    <div class="space-y-2 text-sm text-ink-900">
+                        @foreach($displayDetails as $detail)
+                            <div>{{ $detail['nama'] ?? '-' }}</div>
+                        @endforeach
+                    </div>
                 </div>
                 <div>
                     <p class="ui-label">QTY</p>
-                    <p class="text-sm text-ink-900">{{ number_format($barangMasuk->qty) }}</p>
+                    <div class="space-y-2 text-sm text-ink-900 tabular-nums">
+                        @foreach($displayDetails as $detail)
+                            <div>{{ number_format((int) ($detail['quantity'] ?? 0)) }}</div>
+                        @endforeach
+                    </div>
                 </div>
                 <div>
                     <p class="ui-label">Satuan</p>
@@ -42,6 +59,28 @@
                 <div>
                     <p class="ui-label">Estimasi Tiba</p>
                     <p class="text-sm text-ink-900">{{ $displayEstimasi }}</p>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-ink-100 pt-4">
+                <h3 class="mb-3 text-sm font-semibold text-ink-900">Rincian Material</h3>
+                <div class="overflow-hidden rounded-xl border border-ink-200">
+                    <table class="min-w-full divide-y divide-ink-200 text-sm">
+                        <thead class="bg-ink-50 text-ink-600">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold">Material</th>
+                                <th class="px-4 py-3 text-left font-semibold">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-ink-100 bg-white">
+                            @foreach($displayDetails as $detail)
+                                <tr>
+                                    <td class="px-4 py-3">{{ $detail['nama'] ?? '-' }}</td>
+                                    <td class="px-4 py-3 tabular-nums">{{ number_format((int) ($detail['quantity'] ?? 0)) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

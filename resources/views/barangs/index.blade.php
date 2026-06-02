@@ -108,22 +108,31 @@
             </form>
         </div>
 
-        <x-ui.card bodyClass="p-0">
-            <div class="overflow-x-auto">
-                <table class="w-full table-fixed border-collapse">
+        <x-ui.card class="overflow-hidden" style="height: clamp(560px, 72vh, 760px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
+            <div class="border-b border-ink-100 p-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Daftar {{ $isProduk ? 'Produk' : 'Material' }}</p>
+                        <p class="text-xs text-slate-500">Aksi edit dan hapus ada langsung di baris data.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <table class="compact-scroll-table w-full table-fixed border-collapse">
                     <thead>
                         <tr class="border-b border-ink-200 bg-ink-50">
                             @if ($isProduk)
                                 <th class="w-[38%] px-4 py-3 text-left text-sm font-semibold text-ink-600">NAMA PRODUK</th>
                                 <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">UKURAN</th>
                                 <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">SATUAN</th>
-                                <th class="w-[34%] whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-ink-600">AKSI</th>
+                                <th class="w-[30%] whitespace-nowrap px-4 py-3 text-center text-sm font-semibold text-ink-600">AKSI</th>
                             @else
                                 <th class="w-[34%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Nama Produk</th>
                                 <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Ukuran</th>
                                 <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Satuan</th>
                                 <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Stok Saat Ini</th>
-                                <th class="w-[24%] whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-ink-600">Aksi</th>
+                                <th class="w-[20%] whitespace-nowrap px-4 py-3 text-center text-sm font-semibold text-ink-600">Aksi</th>
                             @endif
                         </tr>
                     </thead>
@@ -131,49 +140,31 @@
                         @forelse ($barangs as $barang)
                             <tr class="border-b border-ink-100 hover:bg-ink-50 transition-colors">
                                 @if ($isProduk)
-                                    <td class="w-[40%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">
-                                        {{ $barang->nama }}
-                                    </td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">
-                                        {{ $barang->ukuran ?? '-' }}
-                                    </td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">
-                                        {{ $barang->satuan ?? '-' }}
-                                    </td>
-                                    <td class="w-[34%] align-middle px-4 py-4">
-                                        <div class="flex items-center justify-start gap-2 whitespace-nowrap">
-                                            <x-ui.button :href="route('data-produk.edit', $barang) . '?form_mode=produk'" variant="secondary" class="px-3 py-2 text-xs whitespace-nowrap">
-                                                Edit
-                                            </x-ui.button>
+                                    <td class="w-[40%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
+                                    <td class="w-[30%] align-middle px-4 py-4">
+                                        <div class="flex flex-wrap items-center justify-center gap-1.5 whitespace-nowrap">
+                                            <x-ui.button :href="route('data-produk.edit', $barang) . '?form_mode=produk'" variant="secondary" class="px-2.5 py-2 text-xs whitespace-nowrap">Edit</x-ui.button>
                                             <form id="deleteForm{{ $barang->getKey() }}" action="{{ route('data-produk.destroy', $barang) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <x-ui.button type="button" variant="danger" class="px-3 py-2 text-xs whitespace-nowrap" onclick="confirmDelete(event, '{{ $barang->getKey() }}', '{{ $barang->nama }}')">Hapus</x-ui.button>
+                                                <x-ui.button type="button" variant="danger" class="px-2.5 py-2 text-xs whitespace-nowrap" onclick="confirmDelete(event, '{{ $barang->getKey() }}', '{{ $barang->nama }}')">Hapus</x-ui.button>
                                             </form>
                                         </div>
                                     </td>
                                 @else
-                                    <td class="w-[35%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">
-                                        {{ $barang->nama }}
-                                    </td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">
-                                        {{ $barang->ukuran ?? '-' }}
-                                    </td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">
-                                        {{ $barang->satuan ?? '-' }}
-                                    </td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">
-                                        {{ number_format((int) $barang->display_quantity, 0, ',', '.') }}
-                                    </td>
-                                    <td class="w-[24%] align-middle px-4 py-4">
-                                        <div class="flex items-center justify-start gap-2 whitespace-nowrap">
-                                            <x-ui.button :href="route('data-material.edit', $barang) . '?form_mode=material'" variant="secondary" class="px-3 py-2 text-xs whitespace-nowrap">
-                                                Edit
-                                            </x-ui.button>
-                                                <form id="deleteForm{{ $barang->getKey() }}" action="{{ route('data-material.destroy-barang', $barang) }}" method="POST">
+                                    <td class="w-[35%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ number_format((int) $barang->display_quantity, 0, ',', '.') }}</td>
+                                    <td class="w-[20%] align-middle px-4 py-4">
+                                        <div class="flex flex-wrap items-center justify-center gap-1.5 whitespace-nowrap">
+                                            <x-ui.button :href="route('data-material.edit', $barang) . '?form_mode=material'" variant="secondary" class="px-2.5 py-2 text-xs whitespace-nowrap">Edit</x-ui.button>
+                                            <form id="deleteForm{{ $barang->getKey() }}" action="{{ route('data-material.destroy-barang', $barang) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <x-ui.button type="button" variant="danger" class="px-3 py-2 text-xs whitespace-nowrap" onclick="confirmDelete(event, '{{ $barang->getKey() }}', '{{ $barang->nama }}')">Hapus</x-ui.button>
+                                                <x-ui.button type="button" variant="danger" class="px-2.5 py-2 text-xs whitespace-nowrap" onclick="confirmDelete(event, '{{ $barang->getKey() }}', '{{ $barang->nama }}')">Hapus</x-ui.button>
                                             </form>
                                         </div>
                                     </td>
@@ -185,7 +176,6 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-ink-100 p-4">{{ $barangs->links() }}</div>
         </x-ui.card>
     </div>
 
@@ -214,6 +204,25 @@
         };
     }
     </script>
+
+    <style>
+    .compact-scroll-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+    }
+
+    .compact-scroll-table th,
+    .compact-scroll-table td {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .compact-scroll-table tbody tr {
+        height: 52px;
+    }
+    </style>
 
     <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
         <div class="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-2xl">

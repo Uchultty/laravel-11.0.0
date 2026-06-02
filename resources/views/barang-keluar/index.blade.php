@@ -57,8 +57,9 @@
             </form>
         </div>
 
-        <x-ui.card bodyClass="p-0">
-            <x-ui.table>
+        <x-ui.card class="overflow-hidden" style="height: clamp(620px, 76vh, 840px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <x-ui.table class="compact-scroll-table">
                 @php
                     $statusLabels = [
                         'Menunggu Pengiriman' => 'Dalam Proses',
@@ -143,7 +144,8 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </x-ui.table>
+                </x-ui.table>
+            </div>
             <div class="border-t border-ink-100 p-4">{{ $barangKeluars->links() }}</div>
         </x-ui.card>
     </div>
@@ -173,6 +175,25 @@
         };
     }
     </script>
+
+        <style>
+        .compact-scroll-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #f8fafc;
+        }
+
+        .compact-scroll-table th,
+        .compact-scroll-table td {
+            padding-top: 0.65rem;
+            padding-bottom: 0.65rem;
+        }
+
+        .compact-scroll-table tbody tr {
+            height: 50px;
+        }
+        </style>
 
     <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
         <div class="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-2xl">

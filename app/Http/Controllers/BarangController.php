@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Material;
 use App\Models\JenisBarang;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
@@ -57,9 +58,9 @@ class BarangController extends Controller
                 ->latest('materials.created_at');
         }
 
-        $barangs = $barangsQuery->paginate(10)->withQueryString();
+        $barangs = $barangsQuery->get();
 
-        $barangs->getCollection()->transform(function ($barang) use ($isProduk) {
+        $barangs->transform(function ($barang) use ($isProduk) {
             if ($isProduk) {
                 $barang->total_masuk = 0;
                 $barang->total_keluar = 0;
@@ -105,8 +106,12 @@ class BarangController extends Controller
     public function create(Request $request)
     {
         $formMode = $this->resolveFormMode($request);
+        $materials = $formMode === 'produk'
+            ? Material::query()->orderBy('nama')->get(['id_material', 'nama', 'kode', 'ukuran'])
+            : collect();
+        $productMaterials = collect();
 
-        return view('barangs.create', compact('formMode'));
+        return view('barangs.create', compact('formMode', 'materials', 'productMaterials'));
     }
 
     public function store(Request $request)
@@ -144,6 +149,8 @@ class BarangController extends Controller
                     'string',
                     'max:100',
                 ],
+                'materials' => 'required|array|min:1',
+                'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],
             ]);
         }
 
@@ -157,12 +164,17 @@ class BarangController extends Controller
 
         $data['source_barang_id'] = $data['kode'];
 
-        if ($formMode === 'material') {
-            $data['stok_minimum'] = (int) $validated['stok_minimum'];
-            Material::create($data);
-        } else {
-            Product::create($data);
-        }
+        DB::transaction(function () use ($formMode, $validated, $data): void {
+            if ($formMode === 'material') {
+                $data['stok_minimum'] = (int) $validated['stok_minimum'];
+                Material::create($data);
+
+                return;
+            }
+
+            $product = Product::create($data);
+            $product->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
+        });
 
         if ($formMode === 'material') {
             return redirect()
@@ -180,6 +192,12 @@ class BarangController extends Controller
         $formMode = $this->resolveFormMode($request);
         $barang = $this->findBarangByMode($formMode, $barang);
 
+        if ($formMode === 'produk') {
+            $barang->load(['materials' => function ($query) {
+                $query->orderBy('nama');
+            }]);
+        }
+
         return view('barangs.show', compact('barang'));
     }
 
@@ -187,7 +205,19 @@ class BarangController extends Controller
     {
         $formMode = $this->resolveFormMode($request, $request->routeIs('data-material.*') ? 'material' : 'produk');
         $barang = $this->findBarangByMode($formMode, $barang);
-        return view('barangs.edit', compact('barang', 'formMode'));
+
+        if ($formMode === 'produk') {
+            $barang->load(['materials' => function ($query) {
+                $query->orderBy('nama');
+            }]);
+        }
+
+        $materials = $formMode === 'produk'
+            ? Material::query()->orderBy('nama')->get(['id_material', 'nama', 'kode', 'ukuran'])
+            : collect();
+        $productMaterials = $formMode === 'produk' ? $barang->materials : collect();
+
+        return view('barangs.edit', compact('barang', 'formMode', 'materials', 'productMaterials'));
     }
 
     public function update(Request $request, string $barang)
@@ -226,6 +256,8 @@ class BarangController extends Controller
                     'string',
                     'max:100',
                 ],
+                'materials' => 'required|array|min:1',
+                'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],
             ]);
         }
 
@@ -240,7 +272,13 @@ class BarangController extends Controller
             $data['stok_minimum'] = (int) $validated['stok_minimum'];
         }
 
-        $barangModel->update($data);
+        DB::transaction(function () use ($formMode, $barangModel, $data, $validated): void {
+            $barangModel->update($data);
+
+            if ($formMode === 'produk') {
+                $barangModel->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
+            }
+        });
 
         if ($formMode === 'material') {
             return redirect()
@@ -318,5 +356,10 @@ class BarangController extends Controller
         $mode = strtolower((string) $request->input('form_mode', $request->query('form_mode', $routeMode !== '' ? $routeMode : ($fallback ?? 'produk'))));
 
         return $mode === 'material' ? 'material' : 'produk';
+    }
+
+    private function buildProductMaterialSyncData(array $materials): array
+    {
+        return [];
     }
 }

@@ -15,8 +15,9 @@
             <div class="ui-alert-success">{{ $message }}</div>
         @endif
 
-        <x-ui.card bodyClass="p-0">
-            <x-ui.table>
+        <x-ui.card class="overflow-hidden" style="height: clamp(620px, 76vh, 840px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <x-ui.table class="compact-scroll-table">
                 <thead>
                     <tr>
                         <th class="text-left">Nama Produk</th>
@@ -89,7 +90,8 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </x-ui.table>
+                </x-ui.table>
+            </div>
 
             <div class="border-t border-ink-100 p-4">{{ $prosesItems->links() }}</div>
         </x-ui.card>
@@ -170,6 +172,25 @@
         };
     }
 </script>
+
+    <style>
+    .compact-scroll-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+    }
+
+    .compact-scroll-table th,
+    .compact-scroll-table td {
+        padding-top: 0.65rem;
+        padding-bottom: 0.65rem;
+    }
+
+    .compact-scroll-table tbody tr {
+        height: 50px;
+    }
+    </style>
 
     <!-- Status Modal -->
     <div id="statusModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">

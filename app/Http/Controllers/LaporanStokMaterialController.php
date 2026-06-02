@@ -33,7 +33,7 @@ class LaporanStokMaterialController extends Controller
             ->whereColumn('quantity', '<=', 'stok_minimum')
             ->count();
 
-        $barangs = $query->paginate(10)->withQueryString();
+        $barangs = $query->get();
 
         return view('laporan.stok-material.index', [
             'barangs' => $barangs,

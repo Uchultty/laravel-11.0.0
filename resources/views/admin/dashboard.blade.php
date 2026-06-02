@@ -112,13 +112,13 @@
         <!-- ROW 2: 2-COLUMN BALANCED LAYOUT -->
         <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- BARANG DALAM PROSES -->
-            <x-ui.card>
+            <x-ui.card style="height: 300px;" bodyClass="h-full flex flex-col overflow-hidden">
                 <div class="flex items-center justify-between">
                     <h4 class="text-lg font-semibold text-ink-900">Barang Dalam Proses</h4>
                     <a href="{{ route('barang-dalam-proses.index') }}" class="text-xs text-brand-600 hover:text-brand-700">Lihat semua →</a>
                 </div>
 
-                <div class="mt-4 overflow-x-auto">
+                <div class="mt-4 min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
                     @if($barangDalamProsesLatest->isEmpty())
                         <div class="py-8 text-center text-ink-500">
                             <p class="text-sm">Belum ada barang dalam proses.</p>
@@ -151,13 +151,13 @@
             </x-ui.card>
 
             <!-- PENGIRIMAN AKTIF -->
-            <x-ui.card>
+            <x-ui.card style="height: 300px;" bodyClass="h-full flex flex-col overflow-hidden">
                 <div class="flex items-center justify-between">
                     <h4 class="text-lg font-semibold text-ink-900">Pengiriman Aktif</h4>
                     <a href="{{ route('pengiriman-produk.index') }}" class="text-xs text-brand-600 hover:text-brand-700">Lihat semua →</a>
                 </div>
 
-                <div class="mt-4 overflow-x-auto">
+                <div class="mt-4 min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
                     @if($pengirimanActive->isEmpty())
                         <div class="py-8 text-center text-ink-500">
                             <p class="text-sm">Belum ada pengiriman aktif.</p>
@@ -189,10 +189,10 @@
         </div>
 
         <!-- ROW 3: AKTIVITAS TERBARU -->
-        <x-ui.card class="mt-6">
+        <x-ui.card class="mt-6 overflow-hidden" style="height: 430px;" bodyClass="h-full flex flex-col">
             <h4 class="text-lg font-semibold text-ink-900">Aktivitas Terbaru</h4>
 
-            <div class="mt-4 space-y-3">
+            <div class="mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
                 @if($activities->isEmpty())
                     <div class="py-6 text-center text-ink-500">
                         <p class="text-sm">Tidak ada aktivitas baru.</p>

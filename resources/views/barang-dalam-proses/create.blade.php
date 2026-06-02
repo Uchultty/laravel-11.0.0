@@ -128,6 +128,7 @@
             if (ukuran) {
                 ukuranInput.value = ukuran;
             }
+            filterMaterialsForSelectedProduct();
         }
 
         function validateMaterialStock() {
@@ -163,5 +164,63 @@
 
             validateMaterialStock();
         });
+
+        // Build a mapping product_id -> [material_ids] from server data
+        (function () {
+            const productMaterials = @json(\App\Models\Product::with('materials:id_material')->get()->map(function($p) {
+                return [
+                    'id' => $p->id_product,
+                    'materials' => $p->materials->pluck('id_material')->all(),
+                ];
+            }));
+
+            // Convert to lookup object for JS
+            window.__productMaterialsMap = {};
+            productMaterials.forEach(function(item) {
+                window.__productMaterialsMap[item.id] = item.materials;
+            });
+
+            // Save original material options by id for reconstruction
+            const materialSelect = document.getElementById('id_barang_mentah');
+            window.__originalMaterialOptions = {};
+            Array.from(materialSelect.options).forEach(function(opt) {
+                if (!opt.value) return; // skip placeholder
+                window.__originalMaterialOptions[opt.value] = opt.outerHTML;
+            });
+
+            // Filtering function
+            window.filterMaterialsForSelectedProduct = function() {
+                const prodSelect = document.getElementById('id_barang');
+                const matSelect = document.getElementById('id_barang_mentah');
+                const selectedProduct = prodSelect.value;
+
+                const placeholder = Array.from(matSelect.options).find(o => !o.value);
+                const placeholderHtml = placeholder ? placeholder.outerHTML : '<option value="" disabled selected>Pilih Material</option>';
+
+                // If no product selected, keep all options
+                if (!selectedProduct) {
+                    let html = placeholderHtml + Object.values(window.__originalMaterialOptions).join('');
+                    matSelect.innerHTML = html;
+                    validateMaterialStock();
+                    return;
+                }
+
+                const allowed = window.__productMaterialsMap[selectedProduct] || [];
+                let html = placeholderHtml;
+
+                allowed.forEach(function(mid) {
+                    const optHtml = window.__originalMaterialOptions[mid];
+                    if (optHtml) html += optHtml;
+                });
+
+                matSelect.innerHTML = html;
+                validateMaterialStock();
+            };
+
+            // Initial filter on load
+            document.addEventListener('DOMContentLoaded', function() {
+                filterMaterialsForSelectedProduct();
+            });
+        })();
     </script>
 </x-app-layout>

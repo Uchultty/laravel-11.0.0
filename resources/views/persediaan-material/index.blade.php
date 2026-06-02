@@ -60,9 +60,9 @@
             </form>
         </x-ui.card>
 
-        <x-ui.card bodyClass="p-0">
-            <div class="overflow-x-auto">
-                <x-ui.table>
+        <x-ui.card class="overflow-hidden" style="height: clamp(620px, 76vh, 840px);" bodyClass="h-full flex flex-col p-0 overflow-hidden">
+            <div class="min-h-0 flex-1 overflow-y-auto overflow-x-auto pr-1">
+                <x-ui.table class="compact-scroll-table">
                     <thead>
                         <tr>
                             <th class="text-left">Tanggal Pemesanan</th>
@@ -78,6 +78,18 @@
                     </thead>
                     <tbody>
                         @forelse($persediaanMaterials as $materialOrder)
+                            @php
+                                $detailMaterials = collect($materialOrder->detail_materials ?? []);
+                                $isMultiDetail = $detailMaterials->isNotEmpty();
+                                $displayDetails = $isMultiDetail
+                                    ? $detailMaterials
+                                    : collect([
+                                        [
+                                            'nama' => optional($materialOrder->material)->nama,
+                                            'quantity' => $materialOrder->qty,
+                                        ],
+                                    ]);
+                            @endphp
                             <tr>
                                 <td class="align-middle text-sm text-ink-700">
                                     {{ optional($materialOrder->tgl_pemesanan)->format('d/m/Y') ?? '-' }}
@@ -86,10 +98,18 @@
                                     {{ $materialOrder->no_po ?? '-' }}
                                 </td>
                                 <td class="align-middle text-sm font-semibold text-ink-800">
-                                    {{ optional($materialOrder->material)->nama ?? '-' }}
+                                    <div class="space-y-1">
+                                        @foreach($displayDetails as $detail)
+                                            <div>{{ $detail['nama'] ?? '-' }}</div>
+                                        @endforeach
+                                    </div>
                                 </td>
                                 <td class="align-middle text-sm tabular-nums text-ink-700">
-                                    {{ number_format($materialOrder->qty) }}
+                                    <div class="space-y-1">
+                                        @foreach($displayDetails as $detail)
+                                            <div>{{ number_format((int) ($detail['quantity'] ?? 0)) }}</div>
+                                        @endforeach
+                                    </div>
                                 </td>
                                 <td class="align-middle text-sm text-ink-700">
                                     {{ $materialOrder->satuan ?? '-' }}
@@ -172,6 +192,25 @@
         };
     }
     </script>
+
+    <style>
+    .compact-scroll-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+    }
+
+    .compact-scroll-table th,
+    .compact-scroll-table td {
+        padding-top: 0.65rem;
+        padding-bottom: 0.65rem;
+    }
+
+    .compact-scroll-table tbody tr {
+        height: 50px;
+    }
+    </style>
 
     <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
         <div class="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-2xl">
