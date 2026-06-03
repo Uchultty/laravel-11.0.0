@@ -145,11 +145,6 @@
                                     <div class="flex items-center justify-center gap-2">
                                         <x-ui.button :href="route('persediaan-material.show', $materialOrder)" variant="ghost" class="px-3 py-2 text-xs">Detail</x-ui.button>
                                         <x-ui.button :href="route('persediaan-material.edit', $materialOrder)" variant="secondary" class="px-3 py-2 text-xs">Edit</x-ui.button>
-                                        <form id="deleteForm{{ $materialOrder->id_pemesanan }}" action="{{ route('persediaan-material.destroy', $materialOrder) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-ui.button type="button" variant="danger" class="px-3 py-2 text-xs" onclick="confirmDelete(event, '{{ $materialOrder->id_pemesanan }}', '{{ optional($materialOrder->material)->nama ?? 'Material' }}')">Hapus</x-ui.button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>

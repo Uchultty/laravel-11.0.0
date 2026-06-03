@@ -47,49 +47,52 @@ class BarangDalamProsesController extends Controller
     public function storeProses(Request $request)
     {
         $validated = $request->validate([
-            'id_barang' => 'required|exists:products,id_product',
-            'no_gambar' => 'nullable|string|max:100',
-            'id_barang_mentah' => 'required|exists:materials,id_material',
-            'quantity' => 'required|integer|min:1',
-            'id_customer' => 'required|exists:pelanggan,id_pelanggan',
-            'no_po' => 'required|string|max:100',
-            'satuan' => 'required|in:mm,inch',
-            'ukuran' => 'required|string|max:100',
-            'tanggal_buat' => 'required|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_buat',
+            'items' => 'required|array|min:1',
+            'items.*.id_barang' => 'required|exists:products,id_product',
+            'items.*.no_gambar' => 'nullable|string|max:100',
+            'items.*.id_barang_mentah' => 'required|exists:materials,id_material',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.id_customer' => 'required|exists:pelanggan,id_pelanggan',
+            'items.*.no_po' => 'required|string|max:100',
+            'items.*.satuan' => 'required|in:mm,inch',
+            'items.*.ukuran' => 'required|string|max:100',
+            'items.*.tanggal_buat' => 'required|date',
+            'items.*.tanggal_selesai' => 'nullable|date',
         ]);
 
-        $qty = (int) $validated['quantity'];
-
         try {
-            DB::transaction(function () use ($validated, $qty): void {
-                $material = Material::query()
-                    ->whereKey($validated['id_barang_mentah'])
-                    ->lockForUpdate()
-                    ->firstOrFail();
+            DB::transaction(function () use ($validated): void {
+                foreach ($validated['items'] as $item) {
+                    $qty = (int) $item['quantity'];
 
-                if ((int) $material->quantity < $qty) {
-                    throw ValidationException::withMessages([
-                        'id_barang_mentah' => 'Stok material tidak cukup untuk quantity yang diminta.',
+                    $material = Material::query()
+                        ->whereKey($item['id_barang_mentah'])
+                        ->lockForUpdate()
+                        ->firstOrFail();
+
+                    if ((int) $material->quantity < $qty) {
+                        throw ValidationException::withMessages([
+                            'items' => 'Stok material tidak cukup untuk salah satu item yang diminta.',
+                        ]);
+                    }
+
+                    $material->decrement('quantity', $qty);
+
+                    ProductionItem::create([
+                        'id_produk' => $item['id_barang'],
+                        'no_gambar' => $item['no_gambar'] ?? null,
+                        'id_material' => $item['id_barang_mentah'],
+                        'id_user' => auth()->id(),
+                        'id_pelanggan' => $item['id_customer'] ?? null,
+                        'no_po' => $item['no_po'],
+                        'status_kirim' => false,
+                        'qty' => $qty,
+                        'satuan' => $item['satuan'],
+                        'ukuran' => $item['ukuran'],
+                        'tgl_dibuat' => $item['tanggal_buat'],
+                        'tgl_selesai' => $item['tanggal_selesai'] ?? null,
                     ]);
                 }
-
-                $material->decrement('quantity', $qty);
-
-                ProductionItem::create([
-                    'id_produk' => $validated['id_barang'],
-                    'no_gambar' => $validated['no_gambar'] ?? null,
-                    'id_material' => $validated['id_barang_mentah'],
-                    'id_user' => auth()->id(),
-                    'id_pelanggan' => $validated['id_customer'] ?? null,
-                    'no_po' => $validated['no_po'],
-                    'status_kirim' => false,
-                    'qty' => $qty,
-                    'satuan' => $validated['satuan'],
-                    'ukuran' => $validated['ukuran'],
-                    'tgl_dibuat' => $validated['tanggal_buat'],
-                    'tgl_selesai' => $validated['tanggal_selesai'] ?? null,
-                ]);
             });
         } catch (ValidationException $exception) {
             return back()->withErrors($exception->errors())->withInput();

@@ -106,6 +106,37 @@
     </div>
 
     <script>
+        function setupProductSearch(selectId) {
+            const select = document.getElementById(selectId);
+
+            if (!select || select.dataset.searchEnhanced) {
+                return;
+            }
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Cari produk...';
+            searchInput.className = 'ui-input mb-2';
+            select.parentElement.insertBefore(searchInput, select);
+
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value.trim().toLowerCase();
+                const selectedValue = select.value;
+
+                Array.from(select.options).forEach(function(option, index) {
+                    if (index === 0 || !option.value) {
+                        option.hidden = false;
+                        return;
+                    }
+
+                    const matches = option.text.toLowerCase().includes(query);
+                    option.hidden = !matches && option.value !== selectedValue;
+                });
+            });
+
+            select.dataset.searchEnhanced = '1';
+        }
+
         function updateUkuranAndSatuan() {
             const select = document.getElementById('id_barang');
             const selectedOption = select.options[select.selectedIndex];
@@ -146,6 +177,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            setupProductSearch('id_barang');
             updateUkuranAndSatuan();
 
             const materialSelect = document.getElementById('id_barang_mentah');

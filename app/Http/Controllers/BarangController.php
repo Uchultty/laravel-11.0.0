@@ -118,6 +118,11 @@ class BarangController extends Controller
     {
         $formMode = $this->resolveFormMode($request);
         $targetTable = $formMode === 'material' ? 'materials' : 'products';
+        // Normalize incoming name early so validation and uniqueness checks use the normalized value
+        $request->merge([
+            'nama' => mb_strtoupper(trim((string) $request->input('nama', ''))),
+            'ukuran' => trim((string) $request->input('ukuran', '')),
+        ]);
 
         if ($formMode === 'material') {
             $validated = $request->validate([
@@ -125,7 +130,7 @@ class BarangController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique($targetTable, 'nama'),
+                    Rule::unique($targetTable, 'nama')->where(fn ($query) => $query->where('ukuran', $request->input('ukuran'))),
                 ],
                 'satuan' => 'required|in:mm,inch',
                 'stok_minimum' => 'required|integer|min:0',
@@ -151,6 +156,12 @@ class BarangController extends Controller
                 ],
                 'materials' => 'required|array|min:1',
                 'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],
+            ], [
+                'materials.required' => 'Tambahkan minimal satu material.',
+                'materials.array' => 'Format material tidak valid.',
+                'materials.min' => 'Tambahkan minimal satu material.',
+                'materials.*.id_material.required' => 'Pilih material untuk setiap baris.',
+                'materials.*.id_material.distinct' => 'Material tidak boleh sama.',
             ]);
         }
 
@@ -164,17 +175,27 @@ class BarangController extends Controller
 
         $data['source_barang_id'] = $data['kode'];
 
-        DB::transaction(function () use ($formMode, $validated, $data): void {
-            if ($formMode === 'material') {
-                $data['stok_minimum'] = (int) $validated['stok_minimum'];
-                Material::create($data);
+        try {
+            DB::transaction(function () use ($formMode, $validated, $data): void {
+                if ($formMode === 'material') {
+                    $data['stok_minimum'] = (int) $validated['stok_minimum'];
+                    Material::create($data);
 
-                return;
+                    return;
+                }
+
+                $product = Product::create($data);
+                $product->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
+            });
+        } catch (QueryException $e) {
+            if (($e->errorInfo[0] ?? null) === '23505') {
+                $message = $formMode === 'material' ? 'Nama material sudah ada' : 'Nama produk sudah ada';
+
+                return back()->withInput()->with('error', $message);
             }
 
-            $product = Product::create($data);
-            $product->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
-        });
+            throw $e;
+        }
 
         if ($formMode === 'material') {
             return redirect()
@@ -226,13 +247,21 @@ class BarangController extends Controller
         $barangModel = $this->findBarangByMode($formMode, $barang);
         $targetTable = $formMode === 'material' ? 'materials' : 'products';
 
+        // Normalize incoming name early so validation and uniqueness checks use the normalized value
+        $request->merge([
+            'nama' => mb_strtoupper(trim((string) $request->input('nama', ''))),
+            'ukuran' => trim((string) $request->input('ukuran', '')),
+        ]);
+
         if ($formMode === 'material') {
             $validated = $request->validate([
                 'nama' => [
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique($targetTable, 'nama')->ignore($barangModel->getKey(), $barangModel->getKeyName()),
+                    Rule::unique($targetTable, 'nama')
+                        ->where(fn ($query) => $query->where('ukuran', $request->input('ukuran')))
+                        ->ignore($barangModel->getKey(), $barangModel->getKeyName()),
                 ],
                 'satuan' => 'required|in:mm,inch',
                 'stok_minimum' => 'required|integer|min:0',
@@ -258,6 +287,12 @@ class BarangController extends Controller
                 ],
                 'materials' => 'required|array|min:1',
                 'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],
+            ], [
+                'materials.required' => 'Tambahkan minimal satu material.',
+                'materials.array' => 'Format material tidak valid.',
+                'materials.min' => 'Tambahkan minimal satu material.',
+                'materials.*.id_material.required' => 'Pilih material untuk setiap baris.',
+                'materials.*.id_material.distinct' => 'Material tidak boleh sama.',
             ]);
         }
 
@@ -272,13 +307,23 @@ class BarangController extends Controller
             $data['stok_minimum'] = (int) $validated['stok_minimum'];
         }
 
-        DB::transaction(function () use ($formMode, $barangModel, $data, $validated): void {
-            $barangModel->update($data);
+        try {
+            DB::transaction(function () use ($formMode, $barangModel, $data, $validated): void {
+                $barangModel->update($data);
 
-            if ($formMode === 'produk') {
-                $barangModel->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
+                if ($formMode === 'produk') {
+                    $barangModel->materials()->sync(array_map(fn($m) => (int) ($m['id_material'] ?? 0), $validated['materials']));
+                }
+            });
+        } catch (QueryException $e) {
+            if (($e->errorInfo[0] ?? null) === '23505') {
+                $message = $formMode === 'material' ? 'Nama material sudah ada' : 'Nama produk sudah ada';
+
+                return back()->withInput()->with('error', $message);
             }
-        });
+
+            throw $e;
+        }
 
         if ($formMode === 'material') {
             return redirect()

@@ -9,6 +9,32 @@
 
     <div class="ui-page">
         <x-ui.card>
+            <style>
+                .detail-rows-scroll {
+                    max-height: 320px;
+                    overflow-y: auto;
+                    padding-right: 6px;
+                }
+
+                .detail-rows-scroll::-webkit-scrollbar {
+                    width: 10px;
+                }
+
+                .detail-rows-scroll::-webkit-scrollbar-track {
+                    background: #e2e8f0;
+                    border-radius: 999px;
+                }
+
+                .detail-rows-scroll::-webkit-scrollbar-thumb {
+                    background: #94a3b8;
+                    border-radius: 999px;
+                    border: 2px solid #e2e8f0;
+                }
+
+                .detail-rows-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #64748b;
+                }
+            </style>
             <form action="{{ route('persediaan-material.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
                 @csrf
 
@@ -31,7 +57,7 @@
                             </button>
                         </div>
 
-                        <div id="detailRows" class="space-y-3">
+                        <div id="detailRows" class="detail-rows-scroll space-y-3">
                             @foreach ($detailRows as $index => $row)
                                 <div class="detail-row grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-3 md:grid-cols-[minmax(0,1fr)_160px_auto] md:items-end">
                                     <div>
@@ -59,6 +85,10 @@
                                 </div>
                             @endforeach
                         </div>
+
+                        <p id="duplicateDetailAlert" class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                            Material yang dipilih sudah ada. Ganti manual supaya tidak dobel.
+                        </p>
 
                         @error('detail_materials') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -168,10 +198,43 @@
             const rowsContainer = document.getElementById('detailRows');
             const addButton = document.getElementById('addDetailRow');
             const template = document.getElementById('detailRowTemplate');
+            const duplicateAlert = document.getElementById('duplicateDetailAlert');
 
-            if (!rowsContainer || !addButton || !template) {
+            if (!rowsContainer || !addButton || !template || !duplicateAlert) {
                 return;
             }
+
+            const updateDuplicateState = () => {
+                const selects = Array.from(rowsContainer.querySelectorAll('.detail-material-select'));
+                const counts = new Map();
+
+                selects.forEach((select) => {
+                    if (!select.value) {
+                        return;
+                    }
+
+                    counts.set(select.value, (counts.get(select.value) ?? 0) + 1);
+                });
+
+                let hasDuplicate = false;
+
+                selects.forEach((select) => {
+                    const isDuplicate = Boolean(select.value) && (counts.get(select.value) ?? 0) > 1;
+
+                    select.classList.toggle('border-red-500', isDuplicate);
+                    select.classList.toggle('ring-2', isDuplicate);
+                    select.classList.toggle('ring-red-500/20', isDuplicate);
+                    select.setCustomValidity(isDuplicate ? 'Material yang dipilih sudah ada.' : '');
+
+                    if (isDuplicate) {
+                        hasDuplicate = true;
+                    }
+                });
+
+                duplicateAlert.classList.toggle('hidden', !hasDuplicate);
+
+                return hasDuplicate;
+            };
 
             const syncRows = () => {
                 const rows = rowsContainer.querySelectorAll('.detail-row');
@@ -201,6 +264,15 @@
                 const row = template.content.firstElementChild.cloneNode(true);
                 rowsContainer.appendChild(row);
                 syncRows();
+                updateDuplicateState();
+            });
+
+            rowsContainer.addEventListener('change', (event) => {
+                if (!event.target.closest('.detail-material-select')) {
+                    return;
+                }
+
+                updateDuplicateState();
             });
 
             rowsContainer.addEventListener('click', (event) => {
@@ -233,9 +305,17 @@
 
                 removeButton.closest('.detail-row')?.remove();
                 syncRows();
+                updateDuplicateState();
+            });
+
+            rowsContainer.closest('form')?.addEventListener('submit', (event) => {
+                if (updateDuplicateState()) {
+                    event.preventDefault();
+                }
             });
 
             syncRows();
+            updateDuplicateState();
         });
     </script>
 </x-app-layout>

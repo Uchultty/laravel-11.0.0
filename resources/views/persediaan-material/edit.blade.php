@@ -67,6 +67,10 @@
                             @endforeach
                         </div>
 
+                        <p id="duplicateDetailAlert" class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                            Material yang dipilih sudah ada. Ganti manual supaya tidak dobel.
+                        </p>
+
                         @error('detail_materials') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
 
@@ -179,10 +183,43 @@
         const rowsContainer = document.getElementById('detailRows');
         const addButton = document.getElementById('addDetailRow');
         const template = document.getElementById('detailRowTemplate');
+        const duplicateAlert = document.getElementById('duplicateDetailAlert');
 
-        if (!rowsContainer || !addButton || !template) {
+        if (!rowsContainer || !addButton || !template || !duplicateAlert) {
             return;
         }
+
+        const updateDuplicateState = () => {
+            const selects = Array.from(rowsContainer.querySelectorAll('.detail-material-select'));
+            const counts = new Map();
+
+            selects.forEach((select) => {
+                if (!select.value) {
+                    return;
+                }
+
+                counts.set(select.value, (counts.get(select.value) ?? 0) + 1);
+            });
+
+            let hasDuplicate = false;
+
+            selects.forEach((select) => {
+                const isDuplicate = Boolean(select.value) && (counts.get(select.value) ?? 0) > 1;
+
+                select.classList.toggle('border-red-500', isDuplicate);
+                select.classList.toggle('ring-2', isDuplicate);
+                select.classList.toggle('ring-red-500/20', isDuplicate);
+                select.setCustomValidity(isDuplicate ? 'Material yang dipilih sudah ada.' : '');
+
+                if (isDuplicate) {
+                    hasDuplicate = true;
+                }
+            });
+
+            duplicateAlert.classList.toggle('hidden', !hasDuplicate);
+
+            return hasDuplicate;
+        };
 
         const syncRows = () => {
             const rows = rowsContainer.querySelectorAll('.detail-row');
@@ -207,6 +244,15 @@
             const row = template.content.firstElementChild.cloneNode(true);
             rowsContainer.appendChild(row);
             syncRows();
+            updateDuplicateState();
+        });
+
+        rowsContainer.addEventListener('change', (event) => {
+            if (!event.target.closest('.detail-material-select')) {
+                return;
+            }
+
+            updateDuplicateState();
         });
 
         rowsContainer.addEventListener('click', (event) => {
@@ -234,8 +280,16 @@
 
             removeButton.closest('.detail-row')?.remove();
             syncRows();
+            updateDuplicateState();
+        });
+
+        rowsContainer.closest('form')?.addEventListener('submit', (event) => {
+            if (updateDuplicateState()) {
+                event.preventDefault();
+            }
         });
 
         syncRows();
+        updateDuplicateState();
     });
 </script>

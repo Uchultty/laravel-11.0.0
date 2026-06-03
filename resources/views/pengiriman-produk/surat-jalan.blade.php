@@ -248,7 +248,7 @@
 		.header-topline {
 			position: absolute;
 			top: 54px;
-			right: 125px;
+			right: 15px;
 			width: auto;
 			display: flex;
 			justify-content: flex-end;
@@ -425,7 +425,7 @@
 		}
 
 		.signature-line {
-			margin-top: 42px;
+			margin-top: 92px;
 			width: 85%;
 			align-self: center;
 			border-bottom: 1px solid #cbd5e1;

@@ -69,23 +69,6 @@
                         <input type="hidden" name="status_pengiriman" value="Siap Dikirim">
                     </div>
 
-                    <div class="border-b pb-6">
-                        <h3 class="text-lg font-semibold text-slate-900 mb-4">File Pendukung</h3>
-
-                        <div class="mb-4">
-                            <label for="surat_jalan" class="block text-sm font-medium text-slate-700 mb-1">Surat Jalan</label>
-                            <input type="file" id="surat_jalan" name="surat_jalan" accept=".pdf,.jpg,.jpeg,.png" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('surat_jalan') border-red-500 @enderror">
-                            <p class="text-xs text-slate-500 mt-1">Format: PDF, JPG, PNG (Max 5MB)</p>
-                            @error('surat_jalan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label for="invoice" class="block text-sm font-medium text-slate-700 mb-1">Invoice</label>
-                            <input type="file" id="invoice" name="invoice" accept=".jpg,.jpeg,.png,.pdf" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('invoice') border-red-500 @enderror">
-                            <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, PDF (Max 5MB)</p>
-                            @error('invoice') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
                 @else
                     {{-- Normal form if not from barang dalam proses --}}
                     <div>
@@ -140,25 +123,6 @@
                         <input type="hidden" name="status_pengiriman" value="Siap Dikirim">
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div class="border-b pb-6 sm:col-span-2">
-                            <h3 class="text-lg font-semibold text-slate-900 mb-4">File Pendukung</h3>
-
-                            <div class="mb-4">
-                                <label for="surat_jalan" class="block text-sm font-medium text-slate-700 mb-1">Surat Jalan</label>
-                                <input type="file" id="surat_jalan" name="surat_jalan" accept=".pdf,.jpg,.jpeg,.png" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('surat_jalan') border-red-500 @enderror">
-                                <p class="text-xs text-slate-500 mt-1">Format: PDF, JPG, PNG (Max 5MB)</p>
-                                @error('surat_jalan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label for="invoice" class="block text-sm font-medium text-slate-700 mb-1">Invoice</label>
-                                <input type="file" id="invoice" name="invoice" accept=".jpg,.jpeg,.png,.pdf" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none @error('invoice') border-red-500 @enderror">
-                                <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, PDF (Max 5MB)</p>
-                                @error('invoice') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-                    </div>
                 @endif
 
                 <div class="flex gap-3 pt-6">
@@ -203,6 +167,37 @@
 </x-app-layout>
 
 <script>
+    function setupProductSearch(selectId) {
+        const select = document.getElementById(selectId);
+
+        if (!select || select.dataset.searchEnhanced) {
+            return;
+        }
+
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Cari produk...';
+        searchInput.className = 'ui-input mb-2';
+        select.parentElement.insertBefore(searchInput, select);
+
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim().toLowerCase();
+            const selectedValue = select.value;
+
+            Array.from(select.options).forEach(function(option, index) {
+                if (index === 0 || !option.value) {
+                    option.hidden = false;
+                    return;
+                }
+
+                const matches = option.text.toLowerCase().includes(query);
+                option.hidden = !matches && option.value !== selectedValue;
+            });
+        });
+
+        select.dataset.searchEnhanced = '1';
+    }
+
     function openCancelReserveModal(idBarangProses) {
         const modal = document.getElementById('cancelReserveModal');
         const confirmBtn = document.getElementById('confirmCancelBtn');
@@ -227,6 +222,8 @@
     }
 
     window.addEventListener('load', () => {
+        setupProductSearch('id_barang');
+
         const navEntries = performance.getEntriesByType('navigation');
 
         if (navEntries.length > 0 && navEntries[0].type === 'reload') {

@@ -129,11 +129,6 @@
                                     <x-ui.button :href="route('pengiriman-produk.show', $item)" variant="ghost" class="px-3 py-2 text-xs">Detail</x-ui.button>
                                     @auth
                                         <x-ui.button :href="route('pengiriman-produk.edit', $item)" variant="secondary" class="px-3 py-2 text-xs">Edit</x-ui.button>
-                                        <form id="deleteForm{{ $item->id_barang_keluar }}" action="{{ route('pengiriman-produk.destroy', $item) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-ui.button type="button" variant="danger" class="px-3 py-2 text-xs" onclick="confirmDelete(event, '{{ $item->id_barang_keluar }}', '{{ optional($item->barang)->nama ?? 'Produk' }}')">Hapus</x-ui.button>
-                                        </form>
                                     @endauth
                                 </div>
                             </td>

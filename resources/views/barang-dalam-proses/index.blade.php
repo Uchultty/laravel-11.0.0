@@ -30,7 +30,6 @@
                         <th class="text-left">Pelanggan</th>
                         <th class="text-left">No PO</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,21 +71,10 @@
                                     @endauth
                                 </div>
                             </td>
-                            <td class="align-middle text-center">
-                                @auth
-                                    <div class="flex items-center justify-center gap-2">
-                                        <form id="deleteForm{{ $item->id }}" action="{{ route('barang-dalam-proses.destroy', $item) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-ui.button type="button" variant="danger" class="px-3 py-2 text-xs" onclick="confirmDelete(event, '{{ $item->id }}', '{{ $item->barang?->nama ?? 'Barang' }}')">Hapus</x-ui.button>
-                                        </form>
-                                    </div>
-                                @endauth
-                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada barang dalam proses.</td>
+                            <td colspan="10" class="px-4 py-8 text-center text-sm text-ink-500">Belum ada barang dalam proses.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -94,7 +94,7 @@
             @endif
 
             <div class="ui-actions mt-6 border-t border-ink-100 pt-4">
-                <x-ui.button :href="route('pengiriman-produk.surat-jalan', $pengiriman_produk)" target="_blank">Generate Surat Jalan</x-ui.button>
+                <x-ui.button :href="route('pengiriman-produk.surat-jalan', $pengiriman_produk)" target="_blank">Buat Surat Jalan</x-ui.button>
                 <x-ui.button :href="route('pengiriman-produk.edit', $pengiriman_produk)">Edit</x-ui.button>
                 <x-ui.button :href="route('pengiriman-produk.index')" variant="secondary">Kembali</x-ui.button>
             </div>
