@@ -78,13 +78,113 @@ class BarangKeluarController extends Controller
             ->whereNotNull('no_po')
             ->get(['id_barang_proses', 'id_produk', 'no_po']);
 
-        return view('barang-keluar.create', compact('barangs', 'customers', 'prefillData', 'poItems'));
+        $isGroupPrefill = isset($prefillData['mode']) && $prefillData['mode'] === 'group' && ! empty($prefillData['items']);
+
+        return view('barang-keluar.create', compact('barangs', 'customers', 'prefillData', 'poItems', 'isGroupPrefill'));
     }
 
     public function store(Request $request)
     {
         // Check if coming from barang dalam proses
         $prefillData = session('pengiriman_dari_proses');
+        $isGroupPrefill = isset($prefillData['mode']) && $prefillData['mode'] === 'group' && ! empty($prefillData['items']);
+
+        if ($isGroupPrefill) {
+            $validated = $request->validate([
+                'tanggal_keluar' => 'required|date',
+                'status_pengiriman' => 'nullable|string|in:Siap Dikirim,Sedang Dikirim,Selesai',
+                'surat_jalan' => 'nullable|file|max:5120',
+                'invoice' => 'nullable|file|max:5120',
+            ]);
+
+            $suratJalanPath = $request->hasFile('surat_jalan')
+                ? $request->file('surat_jalan')->store('barang-keluar/surat-jalan', 'public')
+                : null;
+            $invoicePath = $request->hasFile('invoice')
+                ? $request->file('invoice')->store('barang-keluar/invoice', 'public')
+                : null;
+
+            $items = collect($prefillData['items'] ?? []);
+
+            DB::transaction(function () use ($items, $prefillData, $validated, $suratJalanPath, $invoicePath): void {
+                $itemsData = [];
+                $totalQty = 0;
+                $firstIdBarangProses = null;
+                $firstProductionItem = null;
+
+                foreach ($items as $prefillItem) {
+                    $idBarangProses = $prefillItem['id_barang_proses'] ?? null;
+
+                    if (! $idBarangProses) {
+                        continue;
+                    }
+
+                    $productionItem = ProductionItem::query()->with(['material.jenisBarang'])->find($idBarangProses);
+                    if (! $productionItem) {
+                        continue;
+                    }
+
+                    if (! $firstIdBarangProses) {
+                        $firstIdBarangProses = $idBarangProses;
+                        $firstProductionItem = $productionItem;
+                    }
+
+                    $qty = (int) ($prefillItem['quantity'] ?? $productionItem->qty);
+                    $totalQty += $qty;
+
+                    $itemsData[] = [
+                        'id_barang_proses' => $idBarangProses,
+                        'id_produk' => $prefillItem['id_barang'] ?? $productionItem->id_produk,
+                        'no_gambar' => $prefillItem['no_gambar'] ?? $productionItem->no_gambar,
+                        'qty' => $qty,
+                        'material_type' => $productionItem->material?->nama ?? optional($productionItem->material?->jenisBarang)->nama,
+                    ];
+                }
+
+                if (empty($itemsData)) {
+                    return;
+                }
+
+                $materialNama = $firstProductionItem->material?->nama;
+                $materialKategoriNama = optional($firstProductionItem->material?->jenisBarang)->nama;
+
+                $shipment = BarangKeluar::create([
+                    'id_produk' => $itemsData[0]['id_produk'],
+                    'id_pelanggan' => $prefillData['id_customer'] ?? $firstProductionItem->id_pelanggan,
+                    'id_barang_proses' => $firstIdBarangProses,
+                    'no_po' => $prefillData['no_po'] ?? $firstProductionItem->no_po,
+                    'no_gambar' => $itemsData[0]['no_gambar'],
+                    'qty' => $totalQty,
+                    'tanggal_pengiriman' => $validated['tanggal_keluar'],
+                    'status_pengiriman' => $validated['status_pengiriman'] ?? 'Siap Dikirim',
+                    'id_user' => auth()->id(),
+                    'material_type' => $materialNama ?? $materialKategoriNama,
+                    'surat_jalan_path' => $suratJalanPath,
+                    'invoice_path' => $invoicePath,
+                    'items' => $itemsData,
+                ]);
+
+                foreach ($items as $prefillItem) {
+                    $idBarangProses = $prefillItem['id_barang_proses'] ?? null;
+                    if ($idBarangProses) {
+                        ProductionItem::query()
+                            ->where('id_barang_proses', $idBarangProses)
+                            ->update([
+                                'status_kirim' => true,
+                                'processing' => false,
+                                'reserve_token' => null,
+                                'processing_started_at' => null,
+                                'processing_by' => null,
+                                'tgl_selesai' => now()->toDateString(),
+                            ]);
+                    }
+                }
+            });
+
+            session()->forget('pengiriman_dari_proses');
+
+            return redirect()->route('pengiriman-produk.index')->with('success', 'Pengiriman grup produk berhasil ditambahkan');
+        }
 
         // Validation - no stock check because produk langsung dikirim tanpa masuk gudang
         $validated = $request->validate([
@@ -98,12 +198,10 @@ class BarangKeluarController extends Controller
             'surat_jalan' => 'nullable|file|max:5120',
             'invoice' => 'nullable|file|max:5120',
             'id_barang_proses' => 'nullable',
-            'reserve_token' => 'nullable|string',
             'material_nama_prefill' => 'nullable|string',
         ]);
 
         $idBarangProses = $validated['id_barang_proses'] ?? ($prefillData['id_barang_proses'] ?? null);
-        $reserveToken = $validated['reserve_token'] ?? ($prefillData['reserve_token'] ?? null);
 
         // CRITICAL: Verify that id_barang_proses exists before setting it
         // If it doesn't exist (was deleted), set to NULL to avoid FK violation
@@ -152,16 +250,11 @@ class BarangKeluarController extends Controller
             $data['invoice_path'] = $request->file('invoice')->store('barang-keluar/invoice', 'public');
         }
 
-        DB::transaction(function () use ($data, $idBarangProses, $reserveToken): void {
+        DB::transaction(function () use ($data, $idBarangProses): void {
             BarangKeluar::create($data);
 
             if (! empty($idBarangProses)) {
-                $prosesQuery = ProductionItem::query()->where('id_barang_proses', $idBarangProses);
-                if (! empty($reserveToken)) {
-                    $prosesQuery->where('reserve_token', $reserveToken);
-                }
-
-                $proses = $prosesQuery->first();
+                $proses = ProductionItem::query()->where('id_barang_proses', $idBarangProses)->first();
                 if ($proses) {
                     $proses->update([
                         'status_kirim' => true,
@@ -185,7 +278,18 @@ class BarangKeluarController extends Controller
     {
         $pengiriman_produk->load(['barang', 'customer', 'user', 'productionItem.material']);
 
-        return view('barang-keluar.show', compact('pengiriman_produk'));
+        $productionItems = collect();
+        if (!empty($pengiriman_produk->items) && is_array($pengiriman_produk->items)) {
+            $ids = collect($pengiriman_produk->items)->pluck('id_barang_proses')->filter()->values();
+            if ($ids->isNotEmpty()) {
+                $productionItems = ProductionItem::whereIn('id_barang_proses', $ids)
+                    ->with('produk')
+                    ->get()
+                    ->keyBy('id_barang_proses');
+            }
+        }
+
+        return view('barang-keluar.show', compact('pengiriman_produk', 'productionItems'));
     }
 
     public function suratJalan(BarangKeluar $pengiriman_produk)
@@ -350,11 +454,37 @@ class BarangKeluarController extends Controller
             ? 'data:image/png;base64,' . base64_encode((string) file_get_contents($logoPath))
             : asset('images/logo-mab.png');
 
-        $productName = optional($pengiriman_produk->barang)->nama ?? '-';
-        $materialName = data_get($pengiriman_produk, 'productionItem.material.nama')
-            ?? $pengiriman_produk->material_type
-            ?? '-';
         $customerName = optional($pengiriman_produk->customer)->nama ?? '-';
+
+        $items = [];
+        $itemNo = 1;
+
+        if (! empty($pengiriman_produk->items) && is_array($pengiriman_produk->items)) {
+            foreach ($pengiriman_produk->items as $item) {
+                $items[] = [
+                    'no' => $itemNo++,
+                    'nama_barang' => optional(Product::find($item['id_produk']))->nama ?? '-',
+                    'material' => $item['material_type'] ?? '-',
+                    'quantity' => $item['qty'] ?? 0,
+                    'no_gambar' => $item['no_gambar'] ?? '-',
+                    'keterangan' => 'No PO: ' . ($pengiriman_produk->no_po ?? '-'),
+                ];
+            }
+        } else {
+            $productName = optional($pengiriman_produk->barang)->nama ?? '-';
+            $materialName = data_get($pengiriman_produk, 'productionItem.material.nama')
+                ?? $pengiriman_produk->material_type
+                ?? '-';
+
+            $items[] = [
+                'no' => 1,
+                'nama_barang' => $productName,
+                'material' => $materialName,
+                'quantity' => $pengiriman_produk->qty,
+                'no_gambar' => $pengiriman_produk->no_gambar ?? '-',
+                'keterangan' => 'No PO: ' . ($pengiriman_produk->no_po ?? '-'),
+            ];
+        }
 
         return [
             'pengiriman_produk' => $pengiriman_produk,
@@ -364,15 +494,7 @@ class BarangKeluarController extends Controller
             'no_po' => $pengiriman_produk->no_po ?? '-',
             'no_gambar' => $pengiriman_produk->no_gambar ?? '-',
             'logo_src' => $logoSrc,
-            'items' => [
-                [
-                    'no' => 1,
-                    'nama_barang' => $productName,
-                    'material' => $materialName,
-                    'quantity' => $pengiriman_produk->quantity,
-                    'keterangan' => 'No PO: ' . ($pengiriman_produk->no_po ?? '-') . ' | No Gambar: ' . ($pengiriman_produk->no_gambar ?? '-'),
-                ],
-            ],
+            'items' => $items,
             'pdf_mode' => $pdfMode,
         ];
     }
@@ -383,7 +505,11 @@ class BarangKeluarController extends Controller
         preg_match('/(\d+)/', $rawKey, $matches);
         $sequence = isset($matches[1]) ? (int) $matches[1] : 1;
 
-        return sprintf('SJ-%03d', max(1, $sequence));
+        $date = $tanggal instanceof \Illuminate\Support\Carbon
+            ? $tanggal
+            : \Illuminate\Support\Carbon::parse($tanggal);
+
+        return sprintf('SJ-%03d/MAB/%s', max(1, $sequence), $date->format('d-m-Y'));
     }
 
 }

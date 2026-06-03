@@ -67,6 +67,46 @@ class ProductionItem extends Model
         return $this->hasOne(Shipment::class, 'id_barang_proses', 'id_barang_proses');
     }
 
+    public function getIsSiapDikirimAttribute(): bool
+    {
+        return (bool) $this->status_kirim && ! $this->shipment()->exists();
+    }
+
+    public function getIsSelesaiAttribute(): bool
+    {
+        if ($this->relationLoaded('shipment')) {
+            return $this->shipment !== null;
+        }
+
+        return $this->shipment()->exists();
+    }
+
+    public function getStatusLifecycleAttribute(): string
+    {
+        if ($this->is_selesai) {
+            return 'Selesai';
+        }
+
+        if ($this->is_siap_dikirim) {
+            return 'Siap Dikirim';
+        }
+
+        return 'Diproses';
+    }
+
+    public function getStatusLifecycleClassAttribute(): string
+    {
+        if ($this->is_selesai) {
+            return 'bg-slate-100 text-slate-700 border-slate-200';
+        }
+
+        if ($this->is_siap_dikirim) {
+            return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+        }
+
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+    }
+
     // Backward-compatible accessors for legacy field names (views use these)
     public function getIdBarangAttribute()
     {

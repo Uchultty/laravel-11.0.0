@@ -12,7 +12,11 @@
             @if($prefillData)
                 <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
                     <p class="text-sm font-semibold text-blue-900">✓ Data dari Barang Dalam Proses berhasil dimuat</p>
-                    <p class="text-xs text-blue-700">Barang: {{ $prefillData['barang_nama'] }} | Qty: {{ $prefillData['quantity'] }} | Customer: {{ $prefillData['customer_nama'] ?? '-' }}</p>
+                    @if(!empty($isGroupPrefill))
+                        <p class="text-xs text-blue-700">Total item: {{ count($prefillData['items'] ?? []) }} | Customer: {{ $prefillData['customer_nama'] ?? '-' }} | No PO: {{ $prefillData['no_po'] ?? '-' }}</p>
+                    @else
+                        <p class="text-xs text-blue-700">Barang: {{ $prefillData['barang_nama'] }} | Qty: {{ $prefillData['quantity'] }} | Customer: {{ $prefillData['customer_nama'] ?? '-' }}</p>
+                    @endif
                     <p class="text-xs text-blue-700">Tanggal kirim otomatis: {{ $prefillData['tanggal_pengiriman_default'] ?? now()->addDay()->format('Y-m-d') }}</p>
                 </div>
             @endif
@@ -21,38 +25,75 @@
 
                 {{-- Readonly fields dari barang dalam proses --}}
                 @if($prefillData)
-                    <input type="hidden" name="id_barang_proses" value="{{ $prefillData['id_barang_proses'] ?? '' }}">
-                    <input type="hidden" name="reserve_token" value="{{ $prefillData['reserve_token'] ?? '' }}">
-                    <input type="hidden" name="material_nama_prefill" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '' }}">
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="ui-label">Barang</label>
-                            <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['barang_nama'] }}" disabled />
-                            <input type="hidden" name="id_barang" value="{{ $prefillData['id_barang'] }}">
+                    @if(!empty($isGroupPrefill))
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="ui-label">Customer</label>
+                                <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['customer_nama'] ?? '-' }}" disabled />
+                            </div>
+                            <div>
+                                <label for="no_po" class="ui-label">No PO</label>
+                                <input type="text" id="no_po" name="no_po" class="ui-input bg-ink-50" value="{{ $prefillData['no_po'] ?? '' }}" readonly />
+                            </div>
                         </div>
-                        <div>
-                            <label class="ui-label">Customer</label>
-                            <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['customer_nama'] ?? '-' }}" disabled />
-                            <input type="hidden" name="id_customer" value="{{ $prefillData['id_customer'] }}">
+
+                        <div class="rounded-xl border border-slate-200">
+                            <div class="overflow-x-auto">
+                                <table class="w-full min-w-[680px] text-sm">
+                                    <thead class="bg-slate-100 text-slate-700">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left">Barang</th>
+                                            <th class="px-3 py-2 text-left">Material</th>
+                                            <th class="px-3 py-2 text-left">No Gambar</th>
+                                            <th class="px-3 py-2 text-left">Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        @foreach(($prefillData['items'] ?? []) as $detail)
+                                            <tr>
+                                                <td class="px-3 py-2">{{ $detail['barang_nama'] ?? '-' }}</td>
+                                                <td class="px-3 py-2">{{ $detail['material_nama'] ?? '-' }}</td>
+                                                <td class="px-3 py-2">{{ $detail['no_gambar'] ?? '-' }}</td>
+                                                <td class="px-3 py-2">{{ $detail['quantity'] ?? 0 }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div>
-                            <label class="ui-label">Quantity</label>
-                            <input type="number" class="ui-input bg-ink-50" value="{{ $prefillData['quantity'] }}" disabled />
-                            <input type="hidden" name="quantity" value="{{ $prefillData['quantity'] }}">
+                    @else
+                        <input type="hidden" name="id_barang_proses" value="{{ $prefillData['id_barang_proses'] ?? '' }}">
+                        <input type="hidden" name="material_nama_prefill" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '' }}">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="ui-label">Barang</label>
+                                <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['barang_nama'] }}" disabled />
+                                <input type="hidden" name="id_barang" value="{{ $prefillData['id_barang'] }}">
+                            </div>
+                            <div>
+                                <label class="ui-label">Customer</label>
+                                <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['customer_nama'] ?? '-' }}" disabled />
+                                <input type="hidden" name="id_customer" value="{{ $prefillData['id_customer'] }}">
+                            </div>
+                            <div>
+                                <label class="ui-label">Quantity</label>
+                                <input type="number" class="ui-input bg-ink-50" value="{{ $prefillData['quantity'] }}" disabled />
+                                <input type="hidden" name="quantity" value="{{ $prefillData['quantity'] }}">
+                            </div>
+                            <div>
+                                <label for="no_po" class="ui-label">No PO</label>
+                                    <input type="text" id="no_po" name="no_po" class="ui-input bg-ink-50" value="{{ $prefillData['no_po'] ?? '' }}" placeholder="Nomor PO ini ambil dari barang dalam proses" readonly />
+                            </div>
+                            <div>
+                                <label for="no_gambar" class="ui-label">No Gambar</label>
+                                <input type="text" id="no_gambar" name="no_gambar" class="ui-input bg-ink-50 flex-1" value="{{ $prefillData['no_gambar'] ?? '' }}" placeholder="No Gambar dari Barang Dalam Proses" readonly />
+                            </div>
+                            <div>
+                                <label class="ui-label">Material</label>
+                                <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '-' }}" disabled />
+                            </div>
                         </div>
-                        <div>
-                            <label for="no_po" class="ui-label">No PO</label>
-                                <input type="text" id="no_po" name="no_po" class="ui-input bg-ink-50" value="{{ $prefillData['no_po'] ?? '' }}" placeholder="Nomor PO ini ambil dari barang dalam proses" readonly />
-                        </div>
-                        <div>
-                            <label for="no_gambar" class="ui-label">No Gambar</label>
-                            <input type="text" id="no_gambar" name="no_gambar" class="ui-input bg-ink-50 flex-1" value="{{ $prefillData['no_gambar'] ?? '' }}" placeholder="No Gambar dari Barang Dalam Proses" readonly />
-                        </div>
-                        <div>
-                            <label class="ui-label">Material</label>
-                            <input type="text" class="ui-input bg-ink-50" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '-' }}" disabled />
-                        </div>
-                    </div>
+                    @endif
 
                     {{-- Only editable field: Tanggal Keluar --}}
                         <div>
@@ -128,7 +169,14 @@
                 <div class="flex gap-3 pt-6">
                     <x-ui.button type="submit" class="flex-1">Simpan Pengiriman</x-ui.button>
                     @if($prefillData)
-                        <x-ui.button type="button" variant="secondary" class="flex-1" onclick="openCancelReserveModal('{{ $prefillData['id_barang_proses'] }}')">Batal</x-ui.button>
+                        @if(!empty($isGroupPrefill))
+                            <form action="{{ route('barang-dalam-proses.cancel-reserve-group') }}" method="POST" class="flex-1">
+                                @csrf
+                                <x-ui.button type="submit" variant="secondary" class="w-full">Batal</x-ui.button>
+                            </form>
+                        @else
+                            <x-ui.button type="button" variant="secondary" class="flex-1" onclick="openCancelReserveModal('{{ $prefillData['id_barang_proses'] }}')">Batal</x-ui.button>
+                        @endif
                     @else
                         <x-ui.button type="button" variant="secondary" class="flex-1" onclick="window.location.href='{{ route('barang-dalam-proses.index') }}';">Batal</x-ui.button>
                     @endif
@@ -223,12 +271,6 @@
 
     window.addEventListener('load', () => {
         setupProductSearch('id_barang');
-
-        const navEntries = performance.getEntriesByType('navigation');
-
-        if (navEntries.length > 0 && navEntries[0].type === 'reload') {
-            window.location.href = "{{ route('pengiriman-produk.index') }}";
-        }
     });
 
     // Auto-fill No PO when selecting a Barang (uses production items with status_kirim and no_po)

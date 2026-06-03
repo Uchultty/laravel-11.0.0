@@ -247,62 +247,36 @@
 		/* Tanggal kanan atas: Bekasi, tanggal */
 		.header-topline {
 			position: absolute;
-			top: 54px;
+			top: 12px;
 			right: 15px;
-			width: auto;
 			display: flex;
-			justify-content: flex-end;
-			align-items: center;
-			font-size: 15px;
+			flex-direction: column;
+			align-items: flex-end;
+			gap: 3px;
+			font-size: 13px;
 			font-weight: 700;
 			color: #475569;
 			letter-spacing: 0.02em;
-			margin: 0;
 			padding-right: 10px;
 			z-index: 1;
 		}
 
-		/* Gaya teks Bekasi agar lebih tebal */
-		.header-topline span:first-child {
-			font-weight: 900;
-		}
-
-		/* Pemisah teks tanggal */
-		.header-topline span + span::before {
-			content: ', ';
-			font-weight: 700;
-		}
-
-		/* Informasi nomor surat jalan dan customer */
-		.meta-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 10px;
-			margin-top: 18px;
-		}
-
-		.meta-box {
-			border: 1px solid #dbe3ee;
-			border-radius: 14px;
-			padding: 14px 16px;
-			background: linear-gradient(180deg, #fff, #fbfdff);
-		}
-
-		.meta-row {
-			display: grid;
-			grid-template-columns: 140px 1fr;
-			gap: 10px;
-			margin: 6px 0;
+		.header-topline .topline-date {
 			font-size: 14px;
-		}
-
-		.meta-label {
+			font-weight: 900;
 			color: #475569;
-			font-weight: 700;
 		}
 
-		.meta-value {
+		.header-topline .topline-sj {
+			font-size: 13px;
+			font-weight: 800;
+			color: #0f172a;
+		}
+
+		.header-topline .topline-customer {
+			font-size: 13px;
 			font-weight: 700;
+			color: #475569;
 		}
 
 		/* Judul bagian rincian barang */
@@ -538,10 +512,7 @@
 			@if($pdf_mode)
 				<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; font-family: Arial, sans-serif; color: #0f172a;">
 					<tr>
-						<td style="text-align: right; font-size: 12px; padding-bottom: 10px;">Bekasi, {{ $tanggal_kirim instanceof \Illuminate\Support\Carbon ? $tanggal_kirim->format('d/m/Y') : \Illuminate\Support\Carbon::parse($tanggal_kirim)->format('d/m/Y') }}</td>
-					</tr>
-					<tr>
-						<td style="padding-bottom: 12px; border-bottom: 2px solid #0f4c81;">
+						<td style="padding-bottom: 12px; border-bottom: 2px solid #0f4c81; vertical-align: top;">
 							<div style="font-size: 20px; font-weight: bold; letter-spacing: 0.04em;">PT. METAL AMANAH BARU</div>
 							<div style="font-size: 11px; line-height: 1.4; margin-top: 4px; color: #475569;">
 								Alamat : Villa Mutiara Indah Gading 3<br>
@@ -550,32 +521,14 @@
 								Email : metalamanahbaru@yahoo.com
 							</div>
 						</td>
-					</tr>
-					<tr>
-						<td style="padding-top: 12px;">
-							<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; font-size: 12px;">
-								<tr>
-									<td style="width: 150px; font-weight: bold; padding: 4px 0;">Nomor Surat Jalan</td>
-									<td style="padding: 4px 0;">{{ $nomor_surat_jalan }}</td>
-								</tr>
-								<tr>
-									<td style="width: 150px; font-weight: bold; padding: 4px 0;">Customer</td>
-									<td style="padding: 4px 0;">{{ $customer_name }}</td>
-								</tr>
-								<tr>
-									<td style="width: 150px; font-weight: bold; padding: 4px 0;">No PO</td>
-									<td style="padding: 4px 0;">{{ $no_po ?? '-' }}</td>
-								</tr>
-								<tr>
-									<td style="width: 150px; font-weight: bold; padding: 4px 0;">No Gambar</td>
-									<td style="padding: 4px 0;">{{ $no_gambar ?? '-' }}</td>
-								</tr>
-							</table>
+						<td style="padding-bottom: 12px; border-bottom: 2px solid #0f4c81; vertical-align: top; text-align: right; width: 200px;">
+							<div style="font-size: 12px; font-weight: bold; color: #475569;"><span style="color:#0f172a;">Tanggal :</span> Bekasi, {{ $tanggal_kirim instanceof \Illuminate\Support\Carbon ? $tanggal_kirim->format('d/m/Y') : \Illuminate\Support\Carbon::parse($tanggal_kirim)->format('d/m/Y') }}</div>
+							<div style="font-size: 12px; font-weight: bold; color: #0f172a; margin-top: 4px;"><span style="color:#475569;">Surat Jalan :</span> {{ $nomor_surat_jalan }}</div>
+							<div style="font-size: 12px; font-weight: bold; color: #475569; margin-top: 4px;"><span style="color:#0f172a;">Customer :</span> {{ $customer_name }}</div>
 						</td>
 					</tr>
 					<tr>
 						<td style="padding-top: 16px;">
-							<div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">Rincian Barang</div>
 							<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 1px solid #dbe3ee; font-size: 12px;">
 								<thead>
 									<tr style="background: #0f4c81; color: #fff;">
@@ -587,10 +540,11 @@
 								<tbody>
 									@foreach ($items as $item)
 										<tr>
-											<td style="padding: 8px; border-top: 1px solid #dbe3ee; text-align: center; vertical-align: top;">{{ $item['quantity'] }}</td>
+											<td style="padding: 8px; border-top: 1px solid #dbe3ee; text-align: center; vertical-align: top;">{{ $item['quantity'] }} Ea</td>
 											<td style="padding: 8px; border-top: 1px solid #dbe3ee; vertical-align: top;">
 												<div style="font-weight: bold; line-height: 1.35;">{{ $item['nama_barang'] }}</div>
 												<div style="margin-top: 4px; font-weight: bold; line-height: 1.35;">{{ $item['material'] }}</div>
+												<div style="margin-top: 4px; font-size: 11px; color: #475569; line-height: 1.35;">No Gambar: {{ $item['no_gambar'] }}</div>
 											</td>
 											<td style="padding: 8px; border-top: 1px solid #dbe3ee; vertical-align: top; text-align: center;">{{ $item['keterangan'] }}</td>
 										</tr>
@@ -620,11 +574,12 @@
 					</tr>
 				</table>
 			@else
-				<!-- Tanggal surat jalan: Bekasi, tanggal -->
+				<!-- Header: logo, perusahaan, dan info surat jalan di kanan -->
 				<header class="header">
 					<div class="header-topline">
-						<span>Bekasi</span>
-						<span>{{ \Illuminate\Support\Carbon::now('Asia/Jakarta')->format('d/m/Y') }}</span>
+						<div class="topline-date"><span style="color:#475569;font-weight:700;">Tanggal :</span> Bekasi, {{ \Illuminate\Support\Carbon::now('Asia/Jakarta')->format('d/m/Y') }}</div>
+						<div class="topline-sj"><span style="color:#475569;font-weight:700;">Surat Jalan :</span> {{ $nomor_surat_jalan }}</div>
+						<div class="topline-customer"><span style="color:#475569;font-weight:700;">Customer :</span> {{ $customer_name }}</div>
 					</div>
 					<div class="logo">
 						<img src="{{ $logo_src }}" alt="Logo PT. Metal Amanah Baru">
@@ -640,23 +595,8 @@
 					</div>
 				</header>
 
-				<!-- Informasi nomor surat jalan dan customer -->
-				<div class="meta-grid">
-					<div class="meta-box">
-						<div class="meta-row">
-							<div class="meta-label">Nomor Surat Jalan</div>
-							<div class="meta-value">{{ $nomor_surat_jalan }}</div>
-						</div>
-						<div class="meta-row">
-							<div class="meta-label">Customer</div>
-							<div class="meta-value">{{ $customer_name }}</div>
-						</div>
-					</div>
-				</div>
-
 				<!-- Tabel rincian barang -->
 				<div class="table-wrap">
-					<p class="table-caption">Rincian Barang</p>
 					<table>
 						<thead>
 							<tr>
@@ -668,10 +608,11 @@
 						<tbody>
 							@foreach ($items as $item)
 								<tr>
-									<td class="col-qty">{{ $item['quantity'] }}</td>
+									<td class="col-qty">{{ $item['quantity'] }} Ea</td>
 									<td>
 										<div style="font-weight: 700; color: #0f172a; line-height: 1.35;">{{ $item['nama_barang'] }}</div>
 										<div style="margin-top: 4px; font-weight: 700; color: #0f172a; line-height: 1.35;">{{ $item['material'] }}</div>
+										<div style="margin-top: 4px; font-size: 12px; color: #475569; line-height: 1.35;">No Gambar: {{ $item['no_gambar'] }}</div>
 									</td>
 									<td class="col-ket">{{ $item['keterangan'] }}</td>
 								</tr>

@@ -11,7 +11,6 @@ use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class BarangDalamProsesController extends Controller
@@ -22,7 +21,8 @@ class BarangDalamProsesController extends Controller
             ->with([
                 'produk:id_product,nama',
                 'material:id_material,nama',
-                    'pelanggan:id_pelanggan,nama',
+                'pelanggan:id_pelanggan,nama',
+                'shipment:id_pengiriman,id_barang_proses',
             ])
             ->where('status_kirim', false)
             ->latest('created_at')
@@ -47,17 +47,17 @@ class BarangDalamProsesController extends Controller
     public function storeProses(Request $request)
     {
         $validated = $request->validate([
+            'id_customer' => 'required|exists:pelanggan,id_pelanggan',
+            'no_po' => 'required|string|max:100',
+            'tanggal_buat' => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_buat',
             'items' => 'required|array|min:1',
             'items.*.id_barang' => 'required|exists:products,id_product',
             'items.*.no_gambar' => 'nullable|string|max:100',
             'items.*.id_barang_mentah' => 'required|exists:materials,id_material',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.id_customer' => 'required|exists:pelanggan,id_pelanggan',
-            'items.*.no_po' => 'required|string|max:100',
             'items.*.satuan' => 'required|in:mm,inch',
             'items.*.ukuran' => 'required|string|max:100',
-            'items.*.tanggal_buat' => 'required|date',
-            'items.*.tanggal_selesai' => 'nullable|date',
         ]);
 
         try {
@@ -83,14 +83,14 @@ class BarangDalamProsesController extends Controller
                         'no_gambar' => $item['no_gambar'] ?? null,
                         'id_material' => $item['id_barang_mentah'],
                         'id_user' => auth()->id(),
-                        'id_pelanggan' => $item['id_customer'] ?? null,
-                        'no_po' => $item['no_po'],
+                        'id_pelanggan' => $validated['id_customer'],
+                        'no_po' => $validated['no_po'],
                         'status_kirim' => false,
                         'qty' => $qty,
                         'satuan' => $item['satuan'],
                         'ukuran' => $item['ukuran'],
-                        'tgl_dibuat' => $item['tanggal_buat'],
-                        'tgl_selesai' => $item['tanggal_selesai'] ?? null,
+                        'tgl_dibuat' => $validated['tanggal_buat'],
+                        'tgl_selesai' => $validated['tanggal_selesai'] ?? null,
                     ]);
                 }
             });
@@ -252,14 +252,6 @@ class BarangDalamProsesController extends Controller
             return redirect()->route('barang-dalam-proses.index')->with('error', 'Data produk atau material tidak ditemukan.');
         }
 
-        // Set processing flags but NOT status_kirim yet (only set when shipment is successfully saved)
-        $productionItem->update([
-            'processing' => true,
-            'reserve_token' => (string) Str::uuid(),
-            'processing_started_at' => now(),
-            'processing_by' => auth()->id(),
-        ]);
-
         // Get material names
         $materialNama = (string) $material->nama;
         $materialCategoryNama = optional($material->jenisBarang)->nama ?? null;
@@ -277,7 +269,6 @@ class BarangDalamProsesController extends Controller
             'material_nama' => $materialNama,
             'customer_nama' => $productionItem->pelanggan ? (string) $productionItem->pelanggan->nama : null,
             'tanggal_pengiriman_default' => optional($productionItem->tgl_selesai)->format('Y-m-d') ?? now()->addDay()->toDateString(),
-            'reserve_token' => (string) $productionItem->reserve_token,
             'no_po' => $productionItem->no_po ?? null,
         ];
 
@@ -285,6 +276,61 @@ class BarangDalamProsesController extends Controller
 
         return redirect()->route('pengiriman-produk.create')
             ->with('success', 'Reservasi berhasil dibuat. Silahkan lengkapi data pengiriman.');
+    }
+
+    public function preparePengirimanGroup(Request $request)
+    {
+        $validated = $request->validate([
+            'id_pelanggan' => 'required|integer',
+            'no_po' => 'required|string|max:100',
+            'tgl_dibuat' => 'required|date',
+            'tgl_selesai' => 'nullable|date',
+        ]);
+
+        $query = ProductionItem::query()
+            ->with(['produk:id_product,nama', 'material:id_material,nama', 'pelanggan:id_pelanggan,nama'])
+            ->where('status_kirim', false)
+            ->where('id_pelanggan', $validated['id_pelanggan'])
+            ->where('no_po', $validated['no_po'])
+            ->whereDate('tgl_dibuat', $validated['tgl_dibuat']);
+
+        if (! empty($validated['tgl_selesai'])) {
+            $query->whereDate('tgl_selesai', $validated['tgl_selesai']);
+        } else {
+            $query->whereNull('tgl_selesai');
+        }
+
+        $items = $query->get();
+
+        if ($items->isEmpty()) {
+            return redirect()->route('barang-dalam-proses.index')->with('error', 'Data grup barang tidak ditemukan.');
+        }
+
+        $freshItems = $items->map(function (ProductionItem $item) {
+            return [
+                'id_barang_proses' => $item->id_barang_proses,
+                'id_barang' => $item->id_produk,
+                'id_material' => $item->id_material,
+                'barang_nama' => (string) optional($item->produk)->nama,
+                'material_nama' => (string) optional($item->material)->nama,
+                'no_gambar' => $item->no_gambar ?? null,
+                'quantity' => (int) $item->qty,
+            ];
+        })->values()->all();
+
+        $header = $items->first();
+
+        session()->put('pengiriman_dari_proses', [
+            'mode' => 'group',
+            'id_customer' => $header->id_pelanggan,
+            'customer_nama' => $header->pelanggan ? (string) $header->pelanggan->nama : null,
+            'no_po' => $header->no_po,
+            'tanggal_pengiriman_default' => optional($header->tgl_selesai)->format('Y-m-d') ?? now()->addDay()->toDateString(),
+            'items' => $freshItems,
+        ]);
+
+        return redirect()->route('pengiriman-produk.create')
+            ->with('success', 'Reservasi grup berhasil dibuat. Silakan lengkapi data pengiriman.');
     }
 
     public function cancelReserve(ProductionItem $barangDalamProses)
@@ -307,5 +353,27 @@ class BarangDalamProsesController extends Controller
         }
 
         return redirect()->route('barang-dalam-proses.index')->with('success', 'Reservasi dibatalkan');
+    }
+
+    public function cancelReserveGroup()
+    {
+        $prefill = session('pengiriman_dari_proses');
+
+        $itemIds = collect($prefill['items'] ?? [])->pluck('id_barang_proses')->filter()->all();
+
+        if (! empty($itemIds)) {
+            ProductionItem::query()
+                ->whereIn('id_barang_proses', $itemIds)
+                ->update([
+                    'processing' => false,
+                    'reserve_token' => null,
+                    'processing_started_at' => null,
+                    'processing_by' => null,
+                ]);
+        }
+
+        session()->forget('pengiriman_dari_proses');
+
+        return redirect()->route('barang-dalam-proses.index')->with('success', 'Reservasi grup dibatalkan');
     }
 }

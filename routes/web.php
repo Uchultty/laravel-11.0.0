@@ -98,7 +98,9 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('barang-dalam-proses/{barangDalamProses}/status-siap-dikirim', [BarangDalamProsesController::class, 'markSiapDikirim'])->name('barang-dalam-proses.status-siap-dikirim');
         Route::get('barang-dalam-proses/{barangDalamProses}/prepare-pengiriman', [BarangDalamProsesController::class, 'preparePengiriman'])->name('barang-dalam-proses.prepare-pengiriman');
+        Route::post('barang-dalam-proses/prepare-pengiriman-group', [BarangDalamProsesController::class, 'preparePengirimanGroup'])->name('barang-dalam-proses.prepare-pengiriman-group');
         Route::post('barang-dalam-proses/{barangDalamProses}/cancel-reserve', [BarangDalamProsesController::class, 'cancelReserve'])->name('barang-dalam-proses.cancel-reserve');
+        Route::post('barang-dalam-proses/cancel-reserve-group', [BarangDalamProsesController::class, 'cancelReserveGroup'])->name('barang-dalam-proses.cancel-reserve-group');
 
         Route::get('produk/create', [BarangController::class, 'create'])
             ->name('produk.create')

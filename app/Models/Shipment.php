@@ -27,12 +27,14 @@ class Shipment extends Model
         'invoice_path',
         'surat_jalan_path',
         'gambar_path',
+        'items',
     ];
 
     protected $casts = [
         'tanggal_pengiriman' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'items' => 'array',
     ];
 
     public function getRouteKeyName(): string
