@@ -166,21 +166,38 @@
 
                 @endif
 
-                <div class="flex gap-3 pt-6">
-                    <x-ui.button type="submit" class="flex-1">Simpan Pengiriman</x-ui.button>
-                    @if($prefillData)
-                        @if(!empty($isGroupPrefill))
-                            <form action="{{ route('barang-dalam-proses.cancel-reserve-group') }}" method="POST" class="flex-1">
-                                @csrf
-                                <x-ui.button type="submit" variant="secondary" class="w-full">Batal</x-ui.button>
-                            </form>
-                        @else
-                            <x-ui.button type="button" variant="secondary" class="flex-1" onclick="openCancelReserveModal('{{ $prefillData['id_barang_proses'] }}')">Batal</x-ui.button>
-                        @endif
-                    @else
-                        <x-ui.button type="button" variant="secondary" class="flex-1" onclick="window.location.href='{{ route('barang-dalam-proses.index') }}';">Batal</x-ui.button>
-                    @endif
-                </div>
+                <div class="grid grid-cols-2 gap-3 pt-6">
+    <x-ui.button type="submit" class="w-full">
+        Simpan Pengiriman
+    </x-ui.button>
+
+    @if($prefillData)
+        @if(!empty($isGroupPrefill))
+            <form action="{{ route('barang-dalam-proses.cancel-reserve-group') }}" method="POST">
+                @csrf
+                <x-ui.button type="submit" variant="secondary" class="w-full">
+                    Batal
+                </x-ui.button>
+            </form>
+        @else
+            <x-ui.button
+                type="button"
+                variant="secondary"
+                class="w-full"
+                onclick="openCancelReserveModal('{{ $prefillData['id_barang_proses'] }}')">
+                Batal
+            </x-ui.button>
+        @endif
+    @else
+        <x-ui.button
+            type="button"
+            variant="secondary"
+            class="w-full"
+            onclick="window.location.href='{{ route('barang-dalam-proses.index') }}'">
+            Batal
+        </x-ui.button>
+    @endif
+</div>
             </form>
         </x-ui.card>
     </div>

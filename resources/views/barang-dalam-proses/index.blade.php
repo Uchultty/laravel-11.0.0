@@ -129,6 +129,7 @@
         .compact-scroll-table td {
             padding-top: 0.65rem;
             padding-bottom: 0.65rem;
+            white-space: nowrap;
         }
 
         .compact-scroll-table tbody tr {

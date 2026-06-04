@@ -12,95 +12,69 @@
 	<meta charset="utf-8">
 	<title>Surat Jalan {{ $nomor_surat_jalan }}</title>
 </head>
-<body style="font-family: Arial, sans-serif; color: #0f172a; font-size: 12px;">
+<body style="font-family: Arial, sans-serif; color: #0f172a; font-size: 13px; margin: 0; padding: 0;">
+
+	{{-- Header: logo + info kanan atas --}}
 	<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
 		<tr>
-			<td style="text-align: right; padding-bottom: 10px;">Bekasi, {{ $tanggal_kirim instanceof \Illuminate\Support\Carbon ? $tanggal_kirim->format('d/m/Y') : \Illuminate\Support\Carbon::parse($tanggal_kirim)->format('d/m/Y') }}</td>
-		</tr>
-		<tr>
-			<td style="border-bottom: 2px solid #0f4c81; padding-bottom: 10px;">
-				<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
-					<tr>
-						<td style="width: 180px; vertical-align: top; padding-right: 12px;">
-							<img src="{{ $logo_src }}" alt="Logo PT. Metal Amanah Baru" style="width: 160px; height: auto; display: block;">
-						</td>
-						<td style="vertical-align: top;">
-							<div style="font-size: 18px; font-weight: bold;">PT. METAL AMANAH BARU</div>
-							<div style="margin-top: 4px; line-height: 1.4; color: #475569;">
-								Alamat : Villa Mutiara Indah Gading 3<br>
-								Taman Kebalen Blok E1 No. 48, Babelan - Bekasi<br>
-								No-Telp : 0813-9870-0989<br>
-								Email : metalamanahbaru@yahoo.com
-							</div>
-						</td>
-					</tr>
-				</table>
+			<td style="vertical-align: top; padding-bottom: 14px; border-bottom: 2px solid #0f4c81;">
+				<img src="{{ $logo_src }}" alt="Logo PT. Metal Amanah Baru" style="width: 200px; height: auto; display: block; margin-bottom: 8px;">
+				<div style="font-size: 20px; font-weight: bold; letter-spacing: 0.06em;">PT. METAL AMANAH BARU</div>
+				<div style="font-size: 12px; line-height: 1.5; margin-top: 4px; color: #475569;">
+					Alamat : Villa Mutiara Indah Gading 3<br>
+					Taman Kebalen Blok E1 No. 48, Babelan - Bekasi<br>
+					No-Telp : 0813-9870-0989<br>
+					Email : metalamanahbaru@yahoo.com
+				</div>
 			</td>
-		</tr>
-		<tr>
-			<td style="padding-top: 12px;">
-				<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
-					<tr>
-						<td style="width: 150px; font-weight: bold; padding: 4px 0;">Nomor Surat Jalan</td>
-						<td style="padding: 4px 0;">{{ $nomor_surat_jalan }}</td>
-					</tr>
-					<tr>
-						<td style="width: 150px; font-weight: bold; padding: 4px 0;">Customer</td>
-						<td style="padding: 4px 0;">{{ $customer_name }}</td>
-					</tr>
-					<tr>
-						<td style="width: 150px; font-weight: bold; padding: 4px 0;">No PO</td>
-						<td style="padding: 4px 0;">{{ $no_po ?? '-' }}</td>
-					</tr>
-					<tr>
-						<td style="width: 150px; font-weight: bold; padding: 4px 0;">No Gambar</td>
-						<td style="padding: 4px 0;">{{ $no_gambar ?? '-' }}</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td style="padding-top: 16px;">
-				<div style="font-weight: bold; margin-bottom: 8px;">Rincian Barang</div>
-				<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 1px solid #dbe3ee;">
-					<tr style="background: #0f4c81; color: #ffffff;">
-						<th style="padding: 8px; border-right: 1px solid #ffffff; width: 80px;">Jumlah</th>
-						<th style="padding: 8px; border-right: 1px solid #ffffff;">Nama Barang</th>
-						<th style="padding: 8px; width: 180px;">Keterangan</th>
-					</tr>
-					@foreach ($items as $item)
-						<tr>
-							<td style="padding: 8px; border-top: 1px solid #dbe3ee; text-align: center; vertical-align: top;">{{ $item['quantity'] }}</td>
-							<td style="padding: 8px; border-top: 1px solid #dbe3ee; vertical-align: top;">
-								<div style="font-weight: bold; line-height: 1.35;">{{ $item['nama_barang'] }}</div>
-								<div style="margin-top: 4px; font-weight: bold; line-height: 1.35;">{{ $item['material'] }}</div>
-							</td>
-							<td style="padding: 8px; border-top: 1px solid #dbe3ee; vertical-align: top; text-align: center;">{{ $item['keterangan'] }}</td>
-						</tr>
-					@endforeach
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td style="padding-top: 28px;">
-				<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
-					<tr>
-						<td style="width: 50%; vertical-align: top; padding-right: 20px;">
-							<div style="font-weight: bold;">Tanda Terima</div>
-							<div style="height: 60px;"></div>
-							<div style="border-top: 1px solid #dbe3ee; width: 85%;"></div>
-						</td>
-						<td style="width: 50%; vertical-align: top; padding-left: 20px; text-align: left;">
-							<div style="font-weight: bold;">Hormat Kami</div>
-							<div style="color: #475569; font-weight: bold;">PT. Metal Amanah Baru</div>
-							<div style="height: 60px;"></div>
-							<div style="border-top: 1px solid #dbe3ee; width: 85%;"></div>
-						</td>
-					</tr>
-				</table>
+			<td style="vertical-align: top; text-align: right; width: 230px; padding-bottom: 14px; border-bottom: 2px solid #0f4c81;">
+				<div style="font-size: 14px; font-weight: 700; color: #475569;">Bekasi, <span style="color: #0f172a;">{{ $tanggal_kirim instanceof \Illuminate\Support\Carbon ? $tanggal_kirim->format('d/m/Y') : \Illuminate\Support\Carbon::parse($tanggal_kirim)->format('d/m/Y') }}</span></div>
+				<div style="font-size: 13px; font-weight: 800; margin-top: 6px;"><span style="color: #475569;">Surat Jalan :</span> <span style="color: #0f172a;">{{ $nomor_surat_jalan }}</span></div>
+				<div style="font-size: 13px; font-weight: 700; margin-top: 4px;"><span style="color: #475569;">Pelanggan :</span> <span style="color: #0f172a;">{{ $customer_name }}</span></div>
 			</td>
 		</tr>
 	</table>
+
+	{{-- Tabel rincian barang --}}
+	<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 1px solid #dbe3ee; margin-top: 20px; font-size: 13px;">
+		<thead>
+			<tr>
+				<th style="background: #0f4c81; color: #ffffff; padding: 13px 12px; text-align: center; border-right: 2px solid #6b93b8; width: 110px; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;">JUMLAH</th>
+				<th style="background: #0f4c81; color: #ffffff; padding: 13px 12px; text-align: center; border-right: 2px solid #6b93b8; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;">NAMA BARANG</th>
+				<th style="background: #0f4c81; color: #ffffff; padding: 13px 12px; text-align: center; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; width: 200px;">KETERANGAN</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach ($items as $item)
+				@php $rowBg = $loop->even ? '#fbfdff' : '#ffffff'; @endphp
+				<tr>
+					<td style="padding: 12px; border-top: 2px solid #c2cfdd; border-right: 2px solid #c2cfdd; text-align: center; vertical-align: top; background: {{ $rowBg }};">{{ $item['quantity'] }} Ea</td>
+					<td style="padding: 12px; border-top: 2px solid #c2cfdd; border-right: 2px solid #c2cfdd; vertical-align: top; background: {{ $rowBg }};">
+						<div style="font-weight: bold; color: #0f172a; line-height: 1.35;">{{ $item['nama_barang'] }}</div>
+						<div style="margin-top: 4px; font-weight: bold; color: #0f172a; line-height: 1.35;">{{ $item['material'] }}</div>
+						<div style="margin-top: 4px; font-size: 11px; color: #475569; line-height: 1.35;">No Gambar: {{ $item['no_gambar'] }}</div>
+					</td>
+					<td style="padding: 12px; border-top: 2px solid #c2cfdd; text-align: center; vertical-align: top; background: {{ $rowBg }};">{{ $item['keterangan'] }}</td>
+				</tr>
+			@endforeach
+		</tbody>
+	</table>
+
+	{{-- Tanda tangan --}}
+	<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-top: 36px; font-size: 14px;">
+		<tr>
+			<td style="width: 50%; vertical-align: top; padding-right: 20px; padding-top: 12px; border-top: 1px solid #dbe3ee;">
+				<div style="font-weight: bold;">Tanda Terima</div>
+				<div style="height: 92px;"></div>
+			</td>
+			<td style="width: 50%; vertical-align: top; padding-left: 20px; padding-top: 12px; border-top: 1px solid #dbe3ee; text-align: left;">
+				<div style="font-weight: bold;">Hormat Kami</div>
+				<div style="font-weight: bold; color: #475569;">PT. Metal Amanah Baru</div>
+				<div style="height: 70px;"></div>
+			</td>
+		</tr>
+	</table>
+
 </body>
 </html>
 @else
@@ -316,6 +290,8 @@
 			letter-spacing: 0.04em;
 			text-transform: uppercase;
 			border-right: 2px solid rgba(255, 255, 255, 0.55);
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
 		}
 
 		thead th:last-child {
@@ -524,7 +500,7 @@
 						<td style="padding-bottom: 12px; border-bottom: 2px solid #0f4c81; vertical-align: top; text-align: right; width: 200px;">
 							<div style="font-size: 12px; font-weight: bold; color: #475569;"><span style="color:#0f172a;">Tanggal :</span> Bekasi, {{ $tanggal_kirim instanceof \Illuminate\Support\Carbon ? $tanggal_kirim->format('d/m/Y') : \Illuminate\Support\Carbon::parse($tanggal_kirim)->format('d/m/Y') }}</div>
 							<div style="font-size: 12px; font-weight: bold; color: #0f172a; margin-top: 4px;"><span style="color:#475569;">Surat Jalan :</span> {{ $nomor_surat_jalan }}</div>
-							<div style="font-size: 12px; font-weight: bold; color: #475569; margin-top: 4px;"><span style="color:#0f172a;">Customer :</span> {{ $customer_name }}</div>
+							<div style="font-size: 12px; font-weight: bold; color: #475569; margin-top: 4px;"><span style="color:#0f172a;">Pelanggan :</span> {{ $customer_name }}</div>
 						</td>
 					</tr>
 					<tr>
@@ -579,7 +555,7 @@
 					<div class="header-topline">
 						<div class="topline-date"><span style="color:#475569;font-weight:700;">Tanggal :</span> Bekasi, {{ \Illuminate\Support\Carbon::now('Asia/Jakarta')->format('d/m/Y') }}</div>
 						<div class="topline-sj"><span style="color:#475569;font-weight:700;">Surat Jalan :</span> {{ $nomor_surat_jalan }}</div>
-						<div class="topline-customer"><span style="color:#475569;font-weight:700;">Customer :</span> {{ $customer_name }}</div>
+						<div class="topline-customer"><span style="color:#475569;font-weight:700;">Pelanggan :</span> {{ $customer_name }}</div>
 					</div>
 					<div class="logo">
 						<img src="{{ $logo_src }}" alt="Logo PT. Metal Amanah Baru">

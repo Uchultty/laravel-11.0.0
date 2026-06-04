@@ -78,10 +78,10 @@
                     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-bold text-slate-900">Detail Barang</h3>
-                            <p class="mt-1 text-xs text-slate-500">Tambah baris untuk beberapa barang dalam satu pesanan proses.</p>
+                            <p class="mt-1 text-xs text-slate-500">Tambah barang untuk beberapa barang dalam satu pesanan proses.</p>
                         </div>
                         <button type="button" id="addRowBtn" class="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">
-                            + Tambah Baris
+                            + Tambah Barang
                         </button>
                     </div>
 

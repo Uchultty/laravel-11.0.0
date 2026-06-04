@@ -34,7 +34,7 @@
             <h3 class="text-sm font-semibold text-ink-900 mb-4">Informasi Pengiriman</h3>
             <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <dt class="ui-label">Customer</dt>
+                    <dt class="ui-label">Pelanggan</dt>
                     <dd class="text-sm text-ink-900">{{ optional($pengiriman_produk->customer)->nama ?? '-' }}</dd>
                 </div>
                 <div>

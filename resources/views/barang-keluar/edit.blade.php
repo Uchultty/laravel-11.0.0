@@ -28,7 +28,7 @@
                 </div>
 
                 <div>
-                    <label for="id_customer" class="ui-label">Customer</label>
+                    <label for="id_customer" class="ui-label">Pelanggan</label>
                     <select id="id_customer_display" class="ui-input bg-ink-50 text-ink-700" disabled>
                         @foreach ($customers as $customer)
                             <option value="{{ $customer->id_customer }}" {{ $pengiriman_produk->id_customer == $customer->id_customer ? 'selected' : '' }}>
@@ -37,7 +37,7 @@
                         @endforeach
                     </select>
                     <input type="hidden" name="id_customer" value="{{ $pengiriman_produk->id_customer }}">
-                    <p class="mt-1 text-xs text-slate-500">Customer dikunci agar data pengiriman tetap konsisten.</p>
+                    <p class="mt-1 text-xs text-slate-500">Pelanggan dikunci agar data pengiriman tetap konsisten.</p>
                     @error('id_customer') <p class="ui-error">{{ $message }}</p> @enderror
                 </div>
 

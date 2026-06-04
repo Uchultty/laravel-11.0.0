@@ -78,7 +78,7 @@
                         <th class="text-left">Qty</th>
                         <th class="text-left">No PO</th>
                         <th class="text-left">No Gambar</th>
-                        <th class="text-left">Customer</th>
+                        <th class="text-left">Pelanggan</th>
                         <th class="text-left">Tanggal Kirim</th>
                         <th class="text-left">Status</th>
                         <th class="text-left">Surat Jalan</th>
