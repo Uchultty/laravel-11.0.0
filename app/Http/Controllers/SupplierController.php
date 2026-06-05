@@ -31,7 +31,7 @@ class SupplierController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'jabatan' => 'nullable|string|max:255',
+            'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -50,8 +50,8 @@ class SupplierController extends Controller
             'email' => 'nullable|email',
         ]);
 
-        if (!empty($validated['jabatan'])) {
-            $validated['jabatan'] = mb_strtoupper($validated['jabatan']);
+        if (!empty($validated['pic'])) {
+            $validated['pic'] = mb_strtoupper($validated['pic']);
         }
 
         if (!empty($validated['kontak'])) {
@@ -81,7 +81,7 @@ class SupplierController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'jabatan' => 'nullable|string|max:255',
+            'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -100,8 +100,8 @@ class SupplierController extends Controller
             'email' => 'nullable|email',
         ]);
 
-        if (!empty($validated['jabatan'])) {
-            $validated['jabatan'] = mb_strtoupper($validated['jabatan']);
+        if (!empty($validated['pic'])) {
+            $validated['pic'] = mb_strtoupper($validated['pic']);
         }
 
         if (!empty($validated['kontak'])) {

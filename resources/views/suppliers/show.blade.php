@@ -19,8 +19,8 @@
                     <dd class="text-sm text-ink-900">{{ $supplier->nama }}</dd>
                 </div>
                 <div>
-                    <dt class="ui-label">Jabatan</dt>
-                    <dd class="text-sm text-ink-900">{{ $supplier->jabatan ? mb_strtoupper($supplier->jabatan) : '-' }}</dd>
+                    <dt class="ui-label">PIC</dt>
+                    <dd class="text-sm text-ink-900">{{ $supplier->pic ? mb_strtoupper($supplier->pic) : '-' }}</dd>
                 </div>
                 <div>
                     <dt class="ui-label">Kontak</dt>

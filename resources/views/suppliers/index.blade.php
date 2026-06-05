@@ -34,7 +34,7 @@
                     <thead>
                         <tr>
                             <th>Nama Supplier</th>
-                            <th>Jabatan</th>
+                            <th>PIC</th>
                             <th>Alamat</th>
                             <th>Kontak</th>
                             <th>Email</th>
@@ -45,7 +45,7 @@
                         @forelse ($suppliers as $supplier)
                             <tr>
                                 <td class="font-semibold text-ink-800">{{ $supplier->nama }}</td>
-                                <td>{{ $supplier->jabatan ? mb_strtoupper($supplier->jabatan) : '-' }}</td>
+                                <td>{{ $supplier->pic ? mb_strtoupper($supplier->pic) : '-' }}</td>
                                 <td>{{ $supplier->alamat ?: '-' }}</td>
                                 <td>{{ $supplier->kontak ?: '-' }}</td>
                                 <td>{{ $supplier->email ?: '-' }}</td>

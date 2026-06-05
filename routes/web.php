@@ -12,7 +12,6 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangDalamProsesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\JenisBarangController;
-use App\Http\Controllers\LaporanStokMaterialController;
 use App\Http\Controllers\LaporanStokProdukController;
 use App\Http\Controllers\LaporanPengirimanProdukController;
 use App\Http\Controllers\UserManagementController;
@@ -66,8 +65,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('barang-dalam-proses', [BarangDalamProsesController::class, 'index'])->name('barang-dalam-proses.index');
 
-        Route::get('laporan/stok-material', [LaporanStokMaterialController::class, 'index'])->name('laporan-stok-material.index');
-        Route::get('laporan/stok-produk', [LaporanStokProdukController::class, 'index'])->name('laporan-stok-produk.index');
+Route::get('laporan/stok-produk', [LaporanStokProdukController::class, 'index'])->name('laporan-stok-produk.index');
         Route::get('laporan/pengiriman-produk/export-pdf', [LaporanPengirimanProdukController::class, 'exportPdf'])->name('laporan-pengiriman-produk.export-pdf');
         Route::get('laporan/pengiriman-produk', [LaporanPengirimanProdukController::class, 'index'])->name('laporan-pengiriman-produk.index');
     }

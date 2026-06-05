@@ -41,15 +41,11 @@
                 ->count();
 
             $pengirimanProdukRouteExists = Route::has('pengiriman-produk.index');
-            $laporanStokMaterialRouteExists = Route::has('laporan-stok-material.index') || Route::has('laporan-barang.index');
             $laporanPengirimanProdukRouteExists = Route::has('laporan-pengiriman-produk.index');
 
             $pengirimanProdukHref = Route::has('pengiriman-produk.index')
                 ? route('pengiriman-produk.index')
                 : '#';
-            $laporanStokMaterialHref = Route::has('laporan-stok-material.index')
-                ? route('laporan-stok-material.index')
-                : (Route::has('laporan-barang.index') ? route('laporan-barang.index') : '#');
             $laporanPengirimanProdukHref = Route::has('laporan-pengiriman-produk.index')
                 ? route('laporan-pengiriman-produk.index')
                 : '#';
@@ -183,17 +179,7 @@
         <div class="mt-8">
             <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-600" x-cloak x-show="!sidebarCollapsed">Laporan</p>
 
-            <a href="{{ $laporanStokMaterialHref }}" class="{{ $mainMenuClasses }} {{ request()->routeIs('laporan-stok-material.*') ? $mainMenuActive : $mainMenuInactive }} {{ $laporanStokMaterialRouteExists ? '' : 'opacity-60 cursor-not-allowed pointer-events-none' }}">
-                <svg class="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m3 6V7m3 10v-4m4 8H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z" />
-                </svg>
-                <span x-cloak x-show="!sidebarCollapsed">Laporan Stok Material</span>
-                @if(request()->routeIs('laporan-stok-material.*'))
-                    <div class="absolute inset-y-0 right-0 w-1 rounded-r-lg bg-blue-500"></div>
-                @endif
-            </a>
-
-            <a href="{{ $laporanPengirimanProdukHref }}" class="{{ $mainMenuClasses }} {{ request()->routeIs('laporan-pengiriman-produk.*') ? $mainMenuActive : $mainMenuInactive }} {{ $laporanPengirimanProdukRouteExists ? '' : 'opacity-60 cursor-not-allowed pointer-events-none' }}">
+<a href="{{ $laporanPengirimanProdukHref }}" class="{{ $mainMenuClasses }} {{ request()->routeIs('laporan-pengiriman-produk.*') ? $mainMenuActive : $mainMenuInactive }} {{ $laporanPengirimanProdukRouteExists ? '' : 'opacity-60 cursor-not-allowed pointer-events-none' }}">
                 <svg class="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
                 </svg>

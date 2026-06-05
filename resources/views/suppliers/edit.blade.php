@@ -18,9 +18,9 @@
                 </div>
 
                 <div>
-                    <label for="jabatan" class="ui-label">Jabatan</label>
-                    <x-ui.input name="jabatan" id="jabatan" value="{{ old('jabatan', $supplier->jabatan) }}" oninput="this.value = this.value.toUpperCase()" />
-                    @error('jabatan') <p class="ui-error">{{ $message }}</p> @enderror
+                    <label for="pic" class="ui-label">PIC</label>
+                    <x-ui.input name="pic" id="pic" value="{{ old('pic', $supplier->pic) }}" oninput="this.value = this.value.toUpperCase()" />
+                    @error('pic') <p class="ui-error">{{ $message }}</p> @enderror
                 </div>
 
                 <div>

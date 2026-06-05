@@ -89,7 +89,7 @@
                 <tbody>
                     @forelse ($barangKeluars as $item)
                         <tr>
-                            <td class="align-middle text-left text-sm font-semibold text-ink-800">
+                            <td class="align-middle text-left text-sm font-semibold text-ink-800 whitespace-nowrap">
                                 @if (!empty($item->items) && is_array($item->items) && count($item->items) > 1)
                                     @foreach($item->items as $it)
                                         <div>{{ optional(\App\Models\Product::find($it['id_produk'] ?? null))->nama ?? '-' }}</div>
