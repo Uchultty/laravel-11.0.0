@@ -7,7 +7,7 @@
                     <img src="{{ asset('images/logo-mab.png') }}" alt="PT. Metal Amanah Baru" class="h-full w-full object-contain" />
                 </div>
                 <div class="min-w-0" x-cloak x-show="!sidebarCollapsed">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">Pencatatan Gudang</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">mabstock</p>
                     <p class="text-base font-bold text-slate-900">{{ config('app.name', 'PT. Metal Amanah Baru') }}</p>
                 </div>
             </a>

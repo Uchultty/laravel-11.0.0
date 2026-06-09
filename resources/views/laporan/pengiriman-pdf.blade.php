@@ -87,7 +87,7 @@
 <body>
     <div class="header">
         <p class="title">LAPORAN PENGIRIMAN PRODUK</p>
-        <div class="subtitle">Pencatatan Gudang</div>
+        <div class="subtitle">MABSTOCK</div>
         <div class="meta">Tanggal export: {{ $generatedAt->format('d/m/Y H:i') }}</div>
     </div>
 
