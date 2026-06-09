@@ -289,6 +289,7 @@ class BarangDalamProsesController extends Controller
         ];
 
         session()->put('pengiriman_dari_proses', $payload);
+        session()->put('pengiriman_create_once', true);
 
         return redirect()->route('pengiriman-produk.create')
             ->with('success', 'Reservasi berhasil dibuat. Silahkan lengkapi data pengiriman.');
@@ -344,6 +345,8 @@ class BarangDalamProsesController extends Controller
             'tanggal_pengiriman_default' => optional($header->tgl_selesai)->format('Y-m-d') ?? now()->addDay()->toDateString(),
             'items' => $freshItems,
         ]);
+
+        session()->put('pengiriman_create_once', true);
 
         return redirect()->route('pengiriman-produk.create')
             ->with('success', 'Reservasi grup berhasil dibuat. Silakan lengkapi data pengiriman.');

@@ -66,11 +66,43 @@ class BarangKeluarController extends Controller
 
     public function create()
     {
+        $prefillData = session('pengiriman_dari_proses');
+
+        // If prefill data exists but one-time token is gone, user refreshed the page → cancel reserve and go back
+        if ($prefillData) {
+            if (session()->has('pengiriman_create_once')) {
+                session()->forget('pengiriman_create_once');
+            } else {
+                $isGroup = isset($prefillData['mode']) && $prefillData['mode'] === 'group';
+                if ($isGroup) {
+                    $itemIds = collect($prefillData['items'] ?? [])->pluck('id_barang_proses')->filter()->all();
+                    if (! empty($itemIds)) {
+                        ProductionItem::query()->whereIn('id_barang_proses', $itemIds)->update([
+                            'processing' => false,
+                            'reserve_token' => null,
+                            'processing_started_at' => null,
+                            'processing_by' => null,
+                        ]);
+                    }
+                } else {
+                    $id = $prefillData['id_barang_proses'] ?? null;
+                    if ($id) {
+                        ProductionItem::where('id_barang_proses', $id)->update([
+                            'processing' => false,
+                            'reserve_token' => null,
+                            'processing_started_at' => null,
+                            'processing_by' => null,
+                        ]);
+                    }
+                }
+                session()->forget('pengiriman_dari_proses');
+
+                return redirect()->route('barang-dalam-proses.index');
+            }
+        }
+
         $barangs = Product::query()->orderBy('nama')->get();
         $customers = Customer::all();
-
-        // Keep prefill in session until submission/cancel so id_barang_proses is still available on store.
-        $prefillData = session('pengiriman_dari_proses');
 
         // Production items that are marked ready to ship and have a PO number
         $poItems = ProductionItem::query()

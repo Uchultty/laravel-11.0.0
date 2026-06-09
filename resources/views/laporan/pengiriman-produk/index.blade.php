@@ -87,7 +87,16 @@
                                     </span>
                                 </td>
                                 <td class="align-middle text-left text-sm text-ink-700">
-                                    {{ $item->surat_jalan_path ? basename($item->surat_jalan_path) : '-' }}
+                                    @if($item->surat_jalan_path)
+                                        <button type="button"
+                                            onclick="openSuratJalanPreview('{{ addslashes(asset('storage/' . $item->surat_jalan_path)) }}', '{{ pathinfo($item->surat_jalan_path, PATHINFO_EXTENSION) }}')"
+                                            class="inline-flex items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100">
+                                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat
+                                        </button>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td class="align-middle text-left text-sm text-ink-700">
                                     {{ $item->invoice_path ? basename($item->invoice_path) : '-' }}
@@ -103,6 +112,20 @@
             </div>
         </x-ui.card>
     </div>
+{{-- Modal Preview Surat Jalan --}}
+<div id="suratJalanPreviewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div class="flex w-full max-w-3xl flex-col rounded-2xl bg-white shadow-2xl" style="max-height: 90vh;">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <h3 class="text-base font-semibold text-slate-900">Preview Surat Jalan</h3>
+            <button type="button" onclick="closeSuratJalanPreview()" class="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="suratJalanPreviewContent" class="flex-1 overflow-auto p-4" style="min-height: 0;">
+        </div>
+    </div>
+</div>
+
 </x-app-layout>
 
 <style>
@@ -123,3 +146,28 @@
     height: 50px;
 }
 </style>
+
+<script>
+function openSuratJalanPreview(url, ext) {
+    const modal = document.getElementById('suratJalanPreviewModal');
+    const content = document.getElementById('suratJalanPreviewContent');
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+
+    if (imageExts.includes(ext.toLowerCase())) {
+        content.innerHTML = '<img src="' + url + '" class="mx-auto max-w-full rounded-lg" alt="Surat Jalan">';
+    } else {
+        content.innerHTML = '<iframe src="' + url + '" class="h-full w-full rounded-lg border-0" style="min-height:65vh;"></iframe>';
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeSuratJalanPreview() {
+    document.getElementById('suratJalanPreviewModal').classList.add('hidden');
+    document.getElementById('suratJalanPreviewContent').innerHTML = '';
+}
+
+document.getElementById('suratJalanPreviewModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSuratJalanPreview();
+});
+</script>

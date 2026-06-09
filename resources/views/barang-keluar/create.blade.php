@@ -173,12 +173,13 @@
 
     @if($prefillData)
         @if(!empty($isGroupPrefill))
-            <form action="{{ route('barang-dalam-proses.cancel-reserve-group') }}" method="POST">
-                @csrf
-                <x-ui.button type="submit" variant="secondary" class="w-full">
-                    Batal
-                </x-ui.button>
-            </form>
+            <x-ui.button
+                type="button"
+                variant="secondary"
+                class="w-full"
+                onclick="document.getElementById('cancelGroupForm').submit()">
+                Batal
+            </x-ui.button>
         @else
             <x-ui.button
                 type="button"
@@ -199,6 +200,12 @@
     @endif
 </div>
             </form>
+
+@if(!empty($isGroupPrefill))
+<form id="cancelGroupForm" action="{{ route('barang-dalam-proses.cancel-reserve-group') }}" method="POST" style="display:none">
+    @csrf
+</form>
+@endif
         </x-ui.card>
     </div>
 
