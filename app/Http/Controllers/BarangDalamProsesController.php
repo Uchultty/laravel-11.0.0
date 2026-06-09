@@ -15,18 +15,34 @@ use Illuminate\Validation\ValidationException;
 
 class BarangDalamProsesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $prosesItems = ProductionItem::query()
+        $query = ProductionItem::query()
             ->with([
                 'produk:id_product,nama',
                 'material:id_material,nama',
                 'pelanggan:id_pelanggan,nama',
                 'shipment:id_pengiriman,id_barang_proses',
             ])
-            ->where('status_kirim', false)
-            ->latest('created_at')
-            ->paginate(10);
+            ->where('status_kirim', false);
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('produk', fn ($r) => $r->where('nama', 'like', "%{$search}%"))
+                  ->orWhereHas('pelanggan', fn ($r) => $r->where('nama', 'like', "%{$search}%"))
+                  ->orWhere('no_po', 'like', "%{$search}%");
+            });
+        }
+
+        if ($dari = $request->input('tanggal_dari')) {
+            $query->whereDate('tgl_dibuat', '>=', $dari);
+        }
+
+        if ($sampai = $request->input('tanggal_sampai')) {
+            $query->whereDate('tgl_dibuat', '<=', $sampai);
+        }
+
+        $prosesItems = $query->latest('created_at')->paginate(10)->withQueryString();
 
         return view('barang-dalam-proses.index', compact('prosesItems'));
     }

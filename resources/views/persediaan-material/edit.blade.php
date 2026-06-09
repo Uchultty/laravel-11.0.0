@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-2xl font-bold tracking-tight text-ink-900">
-                Edit Persediaan Material
+                Edit Pemesanan Material
             </h2>
         </div>
     </x-slot>

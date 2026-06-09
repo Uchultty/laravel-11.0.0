@@ -15,6 +15,48 @@
             <div class="ui-alert-success">{{ $message }}</div>
         @endif
 
+        <x-ui.card class="mb-6">
+            <form method="GET" action="{{ route('barang-dalam-proses.index') }}" class="grid gap-3 md:grid-cols-[minmax(240px,1fr)_180px_180px_auto] md:items-end">
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Cari</label>
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Nama produk, pelanggan, atau No PO..."
+                        class="w-full rounded-lg border border-ink-200 px-4 py-2.5 text-sm placeholder-ink-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Dari Tanggal</label>
+                    <input
+                        type="date"
+                        name="tanggal_dari"
+                        value="{{ request('tanggal_dari') }}"
+                        class="w-full rounded-lg border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-ink-700 mb-1">Sampai Tanggal</label>
+                    <input
+                        type="date"
+                        name="tanggal_sampai"
+                        value="{{ request('tanggal_sampai') }}"
+                        class="w-full rounded-lg border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <x-ui.button type="submit" class="px-4 py-2.5 text-sm">Filter</x-ui.button>
+                    <a href="{{ route('barang-dalam-proses.index') }}" class="inline-flex items-center rounded-lg border border-ink-200 px-4 py-2.5 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </x-ui.card>
+
         @php
             $groupedItems = $prosesItems->getCollection()->groupBy(function ($item) {
                 return implode('|', [

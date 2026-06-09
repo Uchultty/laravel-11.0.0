@@ -203,7 +203,7 @@ class BarangMasukController extends Controller
         return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil dihapus');
     }
 
-    // Persediaan Material Methods
+    // Pemesanan Material Methods
     public function persediaanMaterialIndex()
     {
         $search = request('search');
