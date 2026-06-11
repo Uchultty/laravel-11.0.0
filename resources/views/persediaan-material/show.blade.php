@@ -68,15 +68,15 @@
                     <table class="min-w-full divide-y divide-ink-200 text-sm">
                         <thead class="bg-ink-50 text-ink-600">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold">Material</th>
-                                <th class="px-4 py-3 text-left font-semibold">Qty</th>
+                                <th class="px-4 py-2 text-left font-semibold">Material</th>
+                                <th class="px-4 py-2 text-left font-semibold">Qty</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-ink-100 bg-white">
                             @foreach($displayDetails as $detail)
                                 <tr>
-                                    <td class="px-4 py-3">{{ $detail['nama'] ?? '-' }}</td>
-                                    <td class="px-4 py-3 tabular-nums">{{ number_format((int) ($detail['quantity'] ?? 0)) }}</td>
+                                    <td class="px-4 py-2">{{ $detail['nama'] ?? '-' }}</td>
+                                    <td class="px-4 py-2 tabular-nums">{{ number_format((int) ($detail['quantity'] ?? 0)) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

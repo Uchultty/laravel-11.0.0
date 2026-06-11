@@ -80,20 +80,20 @@
                     <table class="w-full border-collapse text-sm">
                         <thead>
                             <tr class="bg-sand-50 text-left text-ink-600">
-                                <th class="px-4 py-3 font-semibold">Produk</th>
-                                <th class="px-4 py-3 font-semibold">Ukuran</th>
-                                <th class="px-4 py-3 font-semibold">Satuan</th>
-                                <th class="px-4 py-3 font-semibold">Material</th>
+                                <th class="px-4 py-2 font-semibold">Produk</th>
+                                <th class="px-4 py-2 font-semibold">Ukuran</th>
+                                <th class="px-4 py-2 font-semibold">Satuan</th>
+                                <th class="px-4 py-2 font-semibold">Material</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($pengiriman_produk->items as $it)
                                 @php $pi = $productionItems->get($it['id_barang_proses'] ?? null); @endphp
                                 <tr class="border-t border-sand-100">
-                                    <td class="px-4 py-3 text-ink-900 font-medium">{{ optional($pi?->produk)->nama ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-900">{{ $pi?->ukuran ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-900">{{ $pi?->satuan ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-900">{{ $it['material_type'] ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-900 font-medium">{{ optional($pi?->produk)->nama ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-900">{{ $pi?->ukuran ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-900">{{ $pi?->satuan ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-900">{{ $it['material_type'] ?? '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -128,22 +128,22 @@
                     <table class="w-full border-collapse text-sm">
                         <thead>
                             <tr class="bg-sand-50 text-left text-ink-600">
-                                <th class="px-4 py-3 font-semibold">No</th>
-                                <th class="px-4 py-3 font-semibold">Produk</th>
-                                <th class="px-4 py-3 font-semibold">Qty</th>
-                                <th class="px-4 py-3 font-semibold">No Gambar</th>
-                                <th class="px-4 py-3 font-semibold">Material</th>
+                                <th class="px-4 py-2 font-semibold">No</th>
+                                <th class="px-4 py-2 font-semibold">Produk</th>
+                                <th class="px-4 py-2 font-semibold">Qty</th>
+                                <th class="px-4 py-2 font-semibold">No Gambar</th>
+                                <th class="px-4 py-2 font-semibold">Material</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($pengiriman_produk->items as $i => $it)
                                 @php $prod = \App\Models\Product::find($it['id_produk'] ?? null); @endphp
                                 <tr class="border-t border-sand-100 hover:bg-sand-50/50 transition-colors">
-                                    <td class="px-4 py-3 text-ink-500">{{ $i + 1 }}</td>
-                                    <td class="px-4 py-3 text-ink-900 font-medium">{{ optional($prod)->nama ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-900">{{ $it['qty'] ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-600">{{ $it['no_gambar'] ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-ink-600">{{ $it['material_type'] ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-500">{{ $i + 1 }}</td>
+                                    <td class="px-4 py-2 text-ink-900 font-medium">{{ optional($prod)->nama ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-900">{{ $it['qty'] ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-600">{{ $it['no_gambar'] ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-ink-600">{{ $it['material_type'] ?? '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

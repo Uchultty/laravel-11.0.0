@@ -24,7 +24,7 @@
         </x-ui.card>
 
         @if($deadlineAlertsCount > 0)
-            <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+            <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 shadow-sm">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-lg font-bold">
@@ -137,11 +137,11 @@
                             <tbody class="divide-y">
                                 @foreach($barangDalamProsesLatest as $p)
                                     <tr class="hover:bg-slate-50 transition">
-                                        <td class="px-4 py-3 text-ink-900">{{ $p->barang->nama ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-ink-700">{{ $p->customer->nama ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-ink-700">{{ $p->quantity }}</td>
-                                        <td class="px-4 py-3 text-ink-700">{{ optional($p->tanggal_selesai)->format('d/m/Y') ?? '-' }}</td>
-                                        <td class="px-4 py-3"><span class="inline-block rounded-full px-2.5 py-1 text-xs font-medium {{ $p->status_lifecycle_class ?? 'bg-amber-100 text-amber-700' }}">{{ $p->status_lifecycle }}</span></td>
+                                        <td class="px-4 py-2 text-ink-900">{{ $p->barang->nama ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-ink-700">{{ $p->customer->nama ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-ink-700">{{ $p->quantity }}</td>
+                                        <td class="px-4 py-2 text-ink-700">{{ optional($p->tanggal_selesai)->format('d/m/Y') ?? '-' }}</td>
+                                        <td class="px-4 py-2"><span class="inline-block rounded-full px-2.5 py-1 text-xs font-medium {{ $p->status_lifecycle_class ?? 'bg-amber-100 text-amber-700' }}">{{ $p->status_lifecycle }}</span></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -175,10 +175,10 @@
                             <tbody class="divide-y">
                                 @foreach($pengirimanActive as $k)
                                     <tr class="hover:bg-slate-50 transition">
-                                        <td class="px-4 py-3 text-ink-900">{{ $k->barang->nama ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-ink-700">{{ $k->customer->nama ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-ink-700">{{ optional($k->tanggal_keluar)->format('d/m/Y') ?? '-' }}</td>
-                                        <td class="px-4 py-3"><span class="inline-block rounded-full px-2.5 py-1 text-xs font-medium {{ $k->status_badge_class ?? 'bg-amber-100 text-amber-700' }}">{{ $k->status_display ?? $k->status_pengiriman ?? '-' }}</span></td>
+                                        <td class="px-4 py-2 text-ink-900">{{ $k->barang->nama ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-ink-700">{{ $k->customer->nama ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-ink-700">{{ optional($k->tanggal_keluar)->format('d/m/Y') ?? '-' }}</td>
+                                        <td class="px-4 py-2"><span class="inline-block rounded-full px-2.5 py-1 text-xs font-medium {{ $k->status_badge_class ?? 'bg-amber-100 text-amber-700' }}">{{ $k->status_display ?? $k->status_pengiriman ?? '-' }}</span></td>
                                     </tr>
                                 @endforeach
                             </tbody>

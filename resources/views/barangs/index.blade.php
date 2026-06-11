@@ -16,7 +16,7 @@
         @endif
 
         @if ($message = Session::get('error'))
-            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $message }}</div>
+            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{{ $message }}</div>
         @endif
 
         @if (!$isProduk)
@@ -123,16 +123,16 @@
                     <thead>
                         <tr class="border-b border-ink-200 bg-ink-50">
                             @if ($isProduk)
-                                <th class="w-[38%] px-4 py-3 text-left text-sm font-semibold text-ink-600">NAMA PRODUK</th>
-                                <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">UKURAN</th>
-                                <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">SATUAN</th>
-                                <th class="w-[30%] whitespace-nowrap px-4 py-3 text-center text-sm font-semibold text-ink-600">AKSI</th>
+                                <th class="w-[38%] px-4 py-2 text-left text-sm font-semibold text-ink-600">NAMA PRODUK</th>
+                                <th class="w-[14%] px-4 py-2 text-left text-sm font-semibold text-ink-600">UKURAN</th>
+                                <th class="w-[14%] px-4 py-2 text-left text-sm font-semibold text-ink-600">SATUAN</th>
+                                <th class="w-[30%] whitespace-nowrap px-4 py-2 text-center text-sm font-semibold text-ink-600">AKSI</th>
                             @else
-                                <th class="w-[34%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Nama Produk</th>
-                                <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Ukuran</th>
-                                <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Satuan</th>
-                                <th class="w-[14%] px-4 py-3 text-left text-sm font-semibold text-ink-600">Stok Saat Ini</th>
-                                <th class="w-[20%] whitespace-nowrap px-4 py-3 text-center text-sm font-semibold text-ink-600">Aksi</th>
+                                <th class="w-[34%] px-4 py-2 text-left text-sm font-semibold text-ink-600">Nama Produk</th>
+                                <th class="w-[14%] px-4 py-2 text-left text-sm font-semibold text-ink-600">Ukuran</th>
+                                <th class="w-[14%] px-4 py-2 text-left text-sm font-semibold text-ink-600">Satuan</th>
+                                <th class="w-[14%] px-4 py-2 text-left text-sm font-semibold text-ink-600">Stok Saat Ini</th>
+                                <th class="w-[20%] whitespace-nowrap px-4 py-2 text-center text-sm font-semibold text-ink-600">Aksi</th>
                             @endif
                         </tr>
                     </thead>
@@ -140,10 +140,10 @@
                         @forelse ($barangs as $barang)
                             <tr class="border-b border-ink-100 hover:bg-ink-50 transition-colors">
                                 @if ($isProduk)
-                                    <td class="w-[40%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
-                                    <td class="w-[30%] align-middle px-4 py-4">
+                                    <td class="w-[40%] align-middle px-4 py-2 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-2 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-2 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
+                                    <td class="w-[30%] align-middle px-4 py-2">
                                         <div class="flex flex-wrap items-center justify-center gap-1.5 whitespace-nowrap">
                                             <x-ui.button :href="route('data-produk.edit', $barang) . '?form_mode=produk'" variant="secondary" class="px-2.5 py-2 text-xs whitespace-nowrap">Edit</x-ui.button>
                                             <form id="deleteForm{{ $barang->getKey() }}" action="{{ route('data-produk.destroy', $barang) }}" method="POST">
@@ -154,11 +154,11 @@
                                         </div>
                                     </td>
                                 @else
-                                    <td class="w-[35%] align-middle px-4 py-4 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
-                                    <td class="w-[15%] align-middle px-4 py-4 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ number_format((int) $barang->display_quantity, 0, ',', '.') }}</td>
-                                    <td class="w-[20%] align-middle px-4 py-4">
+                                    <td class="w-[35%] align-middle px-4 py-2 text-left text-sm font-medium text-ink-800 break-words">{{ $barang->nama }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-2 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ $barang->ukuran ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-2 text-left text-sm text-ink-700 whitespace-nowrap">{{ $barang->satuan ?? '-' }}</td>
+                                    <td class="w-[15%] align-middle px-4 py-2 text-left text-sm font-semibold text-ink-700 whitespace-nowrap">{{ number_format((int) $barang->display_quantity, 0, ',', '.') }}</td>
+                                    <td class="w-[20%] align-middle px-4 py-2">
                                         <div class="flex flex-wrap items-center justify-center gap-1.5 whitespace-nowrap">
                                             <x-ui.button :href="route('data-material.edit', $barang) . '?form_mode=material'" variant="secondary" class="px-2.5 py-2 text-xs whitespace-nowrap">Edit</x-ui.button>
                                             <form id="deleteForm{{ $barang->getKey() }}" action="{{ route('data-material.destroy-barang', $barang) }}" method="POST">
@@ -215,12 +215,12 @@
 
     .compact-scroll-table th,
     .compact-scroll-table td {
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
     }
 
     .compact-scroll-table tbody tr {
-        height: 52px;
+        height: 40px;
     }
     </style>
 

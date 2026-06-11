@@ -31,15 +31,15 @@
                         <table class="w-full border-collapse text-sm">
                             <thead>
                                 <tr class="bg-sand-50 text-left text-ink-600">
-                                    <th class="px-4 py-3 font-semibold">Material</th>
-                                    <th class="px-4 py-3 font-semibold">Ukuran</th>
+                                    <th class="px-4 py-2 font-semibold">Material</th>
+                                    <th class="px-4 py-2 font-semibold">Ukuran</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($barang->materials as $material)
                                     <tr class="border-t border-sand-100">
-                                        <td class="px-4 py-3 text-ink-900">{{ $material->nama }}</td>
-                                        <td class="px-4 py-3 text-ink-600">{{ filled($material->ukuran) ? $material->ukuran : '-' }}</td>
+                                        <td class="px-4 py-2 text-ink-900">{{ $material->nama }}</td>
+                                        <td class="px-4 py-2 text-ink-600">{{ filled($material->ukuran) ? $material->ukuran : '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

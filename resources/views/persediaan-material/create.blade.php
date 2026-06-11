@@ -35,7 +35,7 @@
                     background: #64748b;
                 }
             </style>
-            <form action="{{ route('persediaan-material.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
+            <form action="{{ route('persediaan-material.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
                 <!-- Section: Informasi Persediaan -->
