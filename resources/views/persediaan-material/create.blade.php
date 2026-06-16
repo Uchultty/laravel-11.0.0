@@ -38,9 +38,9 @@
             <form action="{{ route('persediaan-material.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
-                <!-- Section: Informasi Persediaan -->
+                <!-- Section: Informasi Pemesanan -->
                 <div class="border-b pb-6">
-                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Informasi Persediaan</h3>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Informasi Pemesanan</h3>
 
                     @php
                         $detailRows = old('detail_materials', [['source_barang_id' => '', 'quantity' => '']]);

@@ -25,7 +25,7 @@
                 @method('PUT')
 
                 <div class="border-b border-ink-100 pb-6">
-                    <h3 class="mb-4 text-lg font-semibold text-ink-900">Informasi Persediaan</h3>
+                    <h3 class="mb-4 text-lg font-semibold text-ink-900">Informasi Pemesanan</h3>
 
                     @php
                         $detailRows = old('detail_materials', $barangMasuk->detail_materials ?: [['source_barang_id' => $barangMasuk->material?->source_barang_id ?? '', 'quantity' => $barangMasuk->qty ?? '']]);

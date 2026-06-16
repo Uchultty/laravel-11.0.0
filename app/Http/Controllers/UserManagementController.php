@@ -39,7 +39,7 @@ class UserManagementController extends Controller
             'email_verified_at' => now(),
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan');
     }
 
     public function show(User $user)
@@ -71,12 +71,12 @@ class UserManagementController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus');
     }
 }

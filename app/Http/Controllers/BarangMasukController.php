@@ -200,7 +200,7 @@ class BarangMasukController extends Controller
 
         $barangMasuk->delete();
 
-        return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil dihapus');
+        return redirect()->route('persediaan-material.index')->with('success', 'Pemesanan material berhasil dihapus');
     }
 
     // Pemesanan Material Methods
@@ -330,7 +330,7 @@ class BarangMasukController extends Controller
             }
         });
 
-        return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil ditambahkan');
+        return redirect()->route('persediaan-material.index')->with('success', 'Pemesanan material berhasil ditambahkan');
     }
 
     public function persediaanMaterialShow(MaterialOrder $barangMasuk)
@@ -459,7 +459,7 @@ class BarangMasukController extends Controller
             Storage::disk('public')->delete($oldInvoice);
         }
 
-        return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil diperbarui');
+        return redirect()->route('persediaan-material.index')->with('success', 'Pemesanan material berhasil diperbarui');
     }
 
     private function resolveDefaultEstimasiTiba(): string
@@ -496,7 +496,7 @@ class BarangMasukController extends Controller
 
         \Log::warning('DESTROY COMPLETED', ['id' => $barangMasuk->id_pemesanan]);
 
-        return redirect()->route('persediaan-material.index')->with('success', 'Persediaan material berhasil dihapus');
+        return redirect()->route('persediaan-material.index')->with('success', 'Pemesanan material berhasil dihapus');
     }
 
     private function generateKodeBarang(): string
