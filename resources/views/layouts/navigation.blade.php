@@ -1,9 +1,10 @@
 <nav class="flex h-full flex-col bg-white border-r border-blue-100">
     <!-- Logo dan Header -->
-    <div class="border-b border-blue-100 px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50" :class="sidebarCollapsed ? 'lg:px-4' : 'lg:px-6'">
-        <div class="flex items-start justify-between gap-3">
+    <div class="border-b border-blue-100 px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50" :class="sidebarCollapsed ? 'lg:px-3' : 'lg:px-6'">
+        <div class="flex items-start gap-3" :class="sidebarCollapsed ? 'lg:justify-center' : 'justify-between'">
             <a href="{{ route('dashboard') }}" class="group flex items-center gap-3 transition-all duration-200">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 p-1 shadow-sm group-hover:shadow-md transition-all sm:h-13 sm:w-13 lg:h-14 lg:w-14">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 p-1 shadow-sm group-hover:shadow-md transition-all sm:h-13 sm:w-13"
+                    :class="sidebarCollapsed ? '' : 'lg:h-14 lg:w-14'">
                     <img src="{{ asset('images/logo-mab.png') }}" alt="PT. Metal Amanah Baru" class="h-full w-full object-contain" />
                 </div>
                 <div class="min-w-0" x-cloak x-show="!sidebarCollapsed">
@@ -24,6 +25,24 @@
                 <p class="truncate text-xs font-semibold text-slate-900">{{ Auth::user()->name }}</p>
             </div>
         </div>
+    </div>
+
+    <!-- Sidebar Toggle (Desktop only, mobile sudah punya tombol tutup + overlay) -->
+    <div class="hidden border-b border-blue-100 px-4 py-3 md:block">
+        <button
+            type="button"
+            class="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600"
+            @click="sidebarCollapsed = !sidebarCollapsed"
+            :title="sidebarCollapsed ? 'Tampilkan Sidebar' : 'Sembunyikan Sidebar'"
+        >
+            <svg x-show="!sidebarCollapsed" class="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <svg x-show="sidebarCollapsed" class="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span x-cloak x-show="!sidebarCollapsed">Sembunyikan Sidebar</span>
+        </button>
     </div>
 
     <!-- Main Menu -->

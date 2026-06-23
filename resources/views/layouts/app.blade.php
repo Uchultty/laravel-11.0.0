@@ -7,7 +7,32 @@
 
         <title>{{ config('app.name', 'PT. Metal Amanah Baru') }}</title>
 
-        <style>[x-cloak] { display: none !important; }</style>
+        <style>
+            [x-cloak] { display: none !important; }
+            /* Saat sidebar diperkecil (icon-only), buat ikon tampil center
+               supaya tidak mojok/kedempet ke tepi kolom */
+            .is-collapsed nav .group {
+                justify-content: center;
+                padding-left: 0.625rem;
+                padding-right: 0.625rem;
+            }
+            /* Scrollbar tipis di sidebar supaya tidak makan lebar rail saat
+               sidebar diperkecil (scrollbar bawaan browser bikin ikon kedempet) */
+            #sidebar-scroll-area {
+                scrollbar-width: thin;
+                scrollbar-color: #cbd5e1 transparent;
+            }
+            #sidebar-scroll-area::-webkit-scrollbar {
+                width: 6px;
+            }
+            #sidebar-scroll-area::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            #sidebar-scroll-area::-webkit-scrollbar-thumb {
+                background-color: #cbd5e1;
+                border-radius: 9999px;
+            }
+        </style>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -32,7 +57,8 @@
                     '-translate-x-full': !mobileSidebarOpen,
                     'translate-x-0': mobileSidebarOpen,
                     'w-20': sidebarCollapsed,
-                    'w-72': !sidebarCollapsed
+                    'w-72': !sidebarCollapsed,
+                    'is-collapsed': sidebarCollapsed
                 }"
             >
                 <!-- Close Button for Mobile -->
@@ -70,24 +96,6 @@
                 </div>
 
                 <div id="main-scroll-area" class="min-h-0 flex-1 overflow-y-auto" data-scroll-restore="main">
-                    <!-- Desktop Sidebar Toggle -->
-                    <div class="hidden md:flex items-center justify-end px-6 pt-6">
-                        <button
-                            type="button"
-                            class="inline-flex h-10 items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-blue-50"
-                            @click="sidebarCollapsed = !sidebarCollapsed"
-                        >
-                            <svg x-show="!sidebarCollapsed" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <svg x-show="sidebarCollapsed" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span x-cloak x-show="!sidebarCollapsed">Sembunyikan sidebar</span>
-                            <span x-cloak x-show="sidebarCollapsed">Tampilkan sidebar</span>
-                        </button>
-                    </div>
-
                     <div class="w-full px-4 py-6 sm:px-6 lg:px-8">
                         <div class="mx-auto max-w-6xl">
                             <!-- Header Section -->
