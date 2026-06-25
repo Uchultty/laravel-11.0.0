@@ -7,7 +7,7 @@
 
     <div class="ui-page">
         <x-ui.card>
-            <form action="{{ route('barang-dalam-proses.update', $barangDalamProses) }}" method="POST" class="space-y-4">
+            <form action="{{ route('barang-dalam-proses.update', $barangDalamProses) }}" method="POST" class="space-y-4" novalidate>
                 @csrf
                 @method('PUT')
 

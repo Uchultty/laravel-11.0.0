@@ -35,7 +35,7 @@
                 }
             </style>
 
-            <form action="{{ route('barang-dalam-proses.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('barang-dalam-proses.store') }}" method="POST" class="space-y-6" novalidate>
                 @csrf
 
                 <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">

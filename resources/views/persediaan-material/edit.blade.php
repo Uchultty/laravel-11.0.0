@@ -20,7 +20,7 @@
         @endif
 
         <x-ui.card>
-            <form action="{{ route('persediaan-material.update', $barangMasuk) }}" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
+            <form action="{{ route('persediaan-material.update', $barangMasuk) }}" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl" novalidate>
                 @csrf
                 @method('PUT')
 

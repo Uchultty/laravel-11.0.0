@@ -9,7 +9,7 @@
         {{-- Stock checks removed for make-to-order flow --}}
 
         <x-ui.card>
-            <form action="{{ route('pengiriman-produk.update', $pengiriman_produk) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('pengiriman-produk.update', $pengiriman_produk) }}" method="POST" enctype="multipart/form-data" class="space-y-4" novalidate>
                 @csrf
                 @method('PUT')
 

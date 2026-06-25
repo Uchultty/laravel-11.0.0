@@ -12,6 +12,7 @@
                 method="POST"
                 enctype="multipart/form-data"
                 class="space-y-4"
+                novalidate
                 x-data='{
                     namaBarang: @json(old("nama_barang", "")),
                     barangSuggestions: @json($barangSuggestions),

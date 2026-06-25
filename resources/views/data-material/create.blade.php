@@ -7,7 +7,7 @@
 
     <div class="ui-page">
         <x-ui.card>
-            <form action="{{ route('data-material.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('data-material.store') }}" method="POST" class="space-y-4" novalidate>
                 @csrf
 
                 <div>

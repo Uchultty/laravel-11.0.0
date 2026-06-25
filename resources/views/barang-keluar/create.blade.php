@@ -20,7 +20,7 @@
                     <p class="text-xs text-blue-700">Tanggal kirim otomatis: {{ $prefillData['tanggal_pengiriman_default'] ?? now()->addDay()->format('Y-m-d') }}</p>
                 </div>
             @endif
-            <form action="{{ route('pengiriman-produk.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('pengiriman-produk.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4" novalidate>
                 @csrf
 
                 {{-- Readonly fields dari barang dalam proses --}}

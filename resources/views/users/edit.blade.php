@@ -7,7 +7,7 @@
 
     <div class="ui-page">
         <x-ui.card>
-            <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-4">
+            <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-4" novalidate>
                 @csrf
                 @method('PUT')
 

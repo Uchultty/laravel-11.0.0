@@ -33,7 +33,7 @@
                     background: #64748b;
                 }
             </style>
-            <form action="{{ ($formMode ?? 'produk') === 'material' ? route('data-material.store') : route('data-produk.store') }}" method="POST" class="space-y-4">
+            <form action="{{ ($formMode ?? 'produk') === 'material' ? route('data-material.store') : route('data-produk.store') }}" method="POST" class="space-y-4" novalidate>
                 @csrf
                 <input type="hidden" name="form_mode" value="{{ $formMode ?? 'produk' }}">
 

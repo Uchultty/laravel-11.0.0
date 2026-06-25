@@ -7,7 +7,7 @@
 
     <div class="ui-page">
         <x-ui.card>
-            <form action="{{ ($formMode ?? 'produk') === 'material' ? route('data-material.update', $barang) : route('data-produk.update', $barang) }}" method="POST" class="space-y-4">
+            <form action="{{ ($formMode ?? 'produk') === 'material' ? route('data-material.update', $barang) : route('data-produk.update', $barang) }}" method="POST" class="space-y-4" novalidate>
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="form_mode" value="{{ $formMode ?? 'produk' }}">
