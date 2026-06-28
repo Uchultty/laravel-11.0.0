@@ -264,6 +264,13 @@ class BarangMasukController extends Controller
             'id_supplier' => 'required|exists:suppliers,id_supplier',
             'surat_jalan_path' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
             'invoice_gambar' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
+        ], [
+            'detail_materials.required' => 'Minimal 1 material wajib ditambahkan.',
+            'detail_materials.*.source_barang_id.required' => 'Barang pada setiap baris material wajib dipilih.',
+            'detail_materials.*.source_barang_id.exists' => 'Barang yang dipilih tidak valid.',
+            'detail_materials.*.quantity.required' => 'Jumlah (qty) pada setiap baris material wajib diisi.',
+            'detail_materials.*.quantity.integer' => 'Jumlah (qty) harus berupa angka.',
+            'detail_materials.*.quantity.min' => 'Jumlah (qty) minimal 1.',
         ]);
 
         $detailMaterials = collect($validated['detail_materials'])
@@ -362,6 +369,13 @@ class BarangMasukController extends Controller
             'id_supplier' => 'required|exists:suppliers,id_supplier',
             'surat_jalan_path' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
             'invoice_gambar' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png',
+        ], [
+            'detail_materials.required' => 'Minimal 1 material wajib ditambahkan.',
+            'detail_materials.*.source_barang_id.required' => 'Barang pada setiap baris material wajib dipilih.',
+            'detail_materials.*.source_barang_id.exists' => 'Barang yang dipilih tidak valid.',
+            'detail_materials.*.quantity.required' => 'Jumlah (qty) pada setiap baris material wajib diisi.',
+            'detail_materials.*.quantity.integer' => 'Jumlah (qty) harus berupa angka.',
+            'detail_materials.*.quantity.min' => 'Jumlah (qty) minimal 1.',
         ]);
 
         // Map incoming details to material IDs
