@@ -196,6 +196,7 @@ return [
         'email' => 'email',
         'password' => 'kata sandi',
         'password_confirmation' => 'konfirmasi kata sandi',
+        'id_customer' => 'Id Pelanggan',
     ],
 
 ];
