@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductionItem;
 
 class BarangKeluar extends Model
 {
@@ -42,9 +43,9 @@ class BarangKeluar extends Model
         return $this->belongsTo(Customer::class, 'id_customer', 'id_pelanggan');
     }
 
-    public function barangDalamProses()
+    public function productionItem()
     {
-        return $this->belongsTo(BarangDalamProses::class, 'id_barang_proses', 'id_barang_proses');
+        return $this->belongsTo(ProductionItem::class, 'id_barang_proses', 'id_barang_proses');
     }
 
     public function user()

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barang;
-use App\Models\BarangDalamProses;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 use App\Models\Material;

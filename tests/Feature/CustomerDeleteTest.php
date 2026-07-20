@@ -18,7 +18,7 @@ class CustomerDeleteTest extends TestCase
             public function exists() { return true; }
         };
 
-        $customerMock->shouldReceive('barangDalamProses')->andReturn($relationStub);
+        $customerMock->shouldReceive('productionItems')->andReturn($relationStub);
         $customerMock->shouldReceive('shipments')->andReturn($relationStub);
 
         $controller = new CustomerController();
@@ -36,7 +36,7 @@ class CustomerDeleteTest extends TestCase
             public function exists() { return false; }
         };
 
-        $customerMock->shouldReceive('barangDalamProses')->andReturn($relationStub);
+        $customerMock->shouldReceive('productionItems')->andReturn($relationStub);
         $customerMock->shouldReceive('shipments')->andReturn($relationStub);
 
         $customerMock->shouldReceive('delete')->andReturn(true);

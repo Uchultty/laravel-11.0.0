@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ProductionItem;
 
 class Customer extends Model
 {
@@ -35,9 +36,9 @@ class Customer extends Model
         return $this->hasMany(BarangKeluar::class, 'id_customer', 'id_pelanggan');
     }
 
-    public function barangDalamProses()
+    public function productionItems()
     {
-        return $this->hasMany(BarangDalamProses::class, 'id_pelanggan', 'id_pelanggan');
+        return $this->hasMany(ProductionItem::class, 'id_pelanggan', 'id_pelanggan');
     }
 
     public function shipments()

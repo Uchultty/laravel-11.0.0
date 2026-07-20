@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use App\Models\Barang;
 use App\Models\BarangMasuk;
-use App\Models\BarangDalamProses;
 use App\Models\BarangKeluar;
 use App\Models\Material;
 use App\Models\Product;

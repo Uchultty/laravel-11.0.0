@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
-use App\Models\BarangDalamProses;
 use App\Models\ProductionItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;

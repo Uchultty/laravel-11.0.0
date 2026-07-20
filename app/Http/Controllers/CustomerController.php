@@ -113,7 +113,7 @@ class CustomerController extends Controller
     public function destroy(Customer $pelanggan)
     {
         if (
-            $pelanggan->barangDalamProses()->exists() ||
+            $pelanggan->productionItems()->exists() ||
             $pelanggan->shipments()->exists()
         ) {
             return redirect()
