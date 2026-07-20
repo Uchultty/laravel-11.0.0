@@ -32,7 +32,6 @@
                         <option value="">Semua Status</option>
                         <option value="Siap Dikirim" @selected(($status ?? '') === 'Siap Dikirim')>Siap Dikirim</option>
                         <option value="Sedang Dikirim" @selected(($status ?? '') === 'Sedang Dikirim')>Sedang Dikirim</option>
-                        <option value="Selesai" @selected(($status ?? '') === 'Selesai')>Selesai</option>
                     </select>
                 </div>
 

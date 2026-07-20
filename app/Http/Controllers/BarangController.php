@@ -146,7 +146,7 @@ class BarangController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique($targetTable, 'nama'),
+                    Rule::unique($targetTable, 'nama')->where(fn ($query) => $query->where('ukuran', $request->input('ukuran'))),
                 ],
                 'satuan' => 'required|in:mm,inch',
                 'ukuran' => [
@@ -277,7 +277,9 @@ class BarangController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    Rule::unique($targetTable, 'nama')->ignore($barangModel->getKey(), $barangModel->getKeyName()),
+                    Rule::unique($targetTable, 'nama')
+                        ->where(fn ($query) => $query->where('ukuran', $request->input('ukuran')))
+                        ->ignore($barangModel->getKey(), $barangModel->getKeyName()),
                 ],
                 'satuan' => 'required|in:mm,inch',
                 'ukuran' => [
