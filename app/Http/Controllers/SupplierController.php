@@ -29,8 +29,12 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'nama' => mb_strtoupper(trim((string) $request->input('nama'))),
+        ]);
+
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:255|unique:suppliers,nama',
             'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
@@ -79,8 +83,12 @@ class SupplierController extends Controller
 
     public function update(Request $request, Supplier $supplier)
     {
+        $request->merge([
+            'nama' => mb_strtoupper(trim((string) $request->input('nama'))),
+        ]);
+
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:255|unique:suppliers,nama,' . $supplier->id_supplier . ',id_supplier',
             'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
@@ -125,7 +133,7 @@ class SupplierController extends Controller
             if (($exception->errorInfo[0] ?? null) === '23503') {
                 return redirect()
                     ->back()
-                    ->with('error', 'Supplier tidak dapat dihapus karena masih dipakai pada transaksi persediaan material.');
+                    ->with('error', 'Supplier tidak dapat dihapus karena masih dipakai pada transaksi pemesanan material.');
             }
 
             throw $exception;

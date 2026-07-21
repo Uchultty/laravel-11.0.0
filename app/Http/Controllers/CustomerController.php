@@ -31,7 +31,7 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:255|unique:pelanggan,nama',
             'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
@@ -77,7 +77,7 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $pelanggan)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:255|unique:pelanggan,nama,' . $pelanggan->id_pelanggan . ',id_pelanggan',
             'pic' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'kontak' => [
