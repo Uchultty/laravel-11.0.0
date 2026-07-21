@@ -18,7 +18,7 @@ class SupplierController extends Controller
             $suppliersQuery->whereRaw('LOWER(nama) LIKE ?', ['%' . mb_strtolower($search) . '%']);
         }
 
-        $suppliers = $suppliersQuery->orderByDesc('updated_at')->get();
+        $suppliers = $suppliersQuery->orderByDesc('updated_at')->paginate(10)->withQueryString();
         return view('suppliers.index', compact('suppliers', 'search'));
     }
 

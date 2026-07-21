@@ -8,17 +8,17 @@
     <div class="ui-page">
         <!-- HEADER SECTION -->
         <x-ui.card>
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="text-2xl font-bold text-ink-900">Selamat Datang, {{ auth()->user()->name }}</h3>
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div class="w-full min-w-0">
+                    <h3 class="text-xl font-bold leading-tight text-ink-900 sm:text-2xl">Selamat Datang, {{ auth()->user()->name }}</h3>
                     <p class="mt-1 text-sm text-ink-600">Anda login sebagai <span class="font-semibold text-brand-700">Admin</span>.</p>
                     <p class="mt-2 text-sm text-ink-600">Monitoring aktivitas gudang, produksi, dan pengiriman.</p>
                 </div>
 
-                <div class="flex gap-2">
-                    <a href="{{ route('data-material.create') }}" class="px-3 py-1.5 text-xs font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">+ Material</a>
-                    <a href="{{ route('barang-dalam-proses.create') }}" class="px-3 py-1.5 text-xs font-medium bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition">+ Proses</a>
-                    <a href="{{ route('pengiriman-produk.create') }}" class="px-3 py-1.5 text-xs font-medium bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition">+ Pengiriman</a>
+                <div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-3 md:w-auto md:flex md:grid-cols-none">
+                    <a href="{{ route('data-material.create') }}" class="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-brand-700 sm:text-sm md:w-auto">+ Material</a>
+                    <a href="{{ route('barang-dalam-proses.create') }}" class="inline-flex w-full items-center justify-center rounded-lg bg-slate-200 px-3 py-2 text-xs font-medium text-slate-900 transition hover:bg-slate-300 sm:text-sm md:w-auto">+ Proses</a>
+                    <a href="{{ route('pengiriman-produk.create') }}" class="inline-flex w-full items-center justify-center rounded-lg bg-slate-200 px-3 py-2 text-xs font-medium text-slate-900 transition hover:bg-slate-300 sm:text-sm md:w-auto">+ Pengiriman</a>
                 </div>
             </div>
         </x-ui.card>

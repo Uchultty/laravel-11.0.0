@@ -90,6 +90,9 @@
                     </tbody>
                 </x-ui.table>
             </div>
+            <div class="border-t border-ink-100 p-4">
+                {{ $suppliers->onEachSide(1)->links('pagination.compact') }}
+            </div>
         </x-ui.card>
     </div>
 
