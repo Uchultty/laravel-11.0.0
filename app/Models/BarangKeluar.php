@@ -19,7 +19,7 @@ class BarangKeluar extends Model
         'id_barang',
         'id_customer',
         'id_user',
-        'id_barang_proses',
+        'id_pemesanan_produk',
         'quantity',
         'tanggal_keluar',
         'gambar_path',
@@ -45,7 +45,7 @@ class BarangKeluar extends Model
 
     public function productionItem()
     {
-        return $this->belongsTo(ProductionItem::class, 'id_barang_proses', 'id_barang_proses');
+        return $this->belongsTo(ProductionItem::class, 'id_pemesanan_produk', 'id_pemesanan_produk');
     }
 
     public function user()

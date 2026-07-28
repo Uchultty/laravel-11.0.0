@@ -34,8 +34,8 @@ class SupplierController extends Controller
         ]);
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:suppliers,nama',
-            'pic' => 'nullable|string|max:255',
+            'nama' => 'required|string|max:100|unique:suppliers,nama',
+            'pic' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -51,7 +51,7 @@ class SupplierController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email',
+            'email' => 'nullable|email|max:100',
         ]);
 
         if (!empty($validated['pic'])) {
@@ -88,8 +88,8 @@ class SupplierController extends Controller
         ]);
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:suppliers,nama,' . $supplier->id_supplier . ',id_supplier',
-            'pic' => 'nullable|string|max:255',
+            'nama' => 'required|string|max:100|unique:suppliers,nama,' . $supplier->id_supplier . ',id_supplier',
+            'pic' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -105,7 +105,7 @@ class SupplierController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email',
+            'email' => 'nullable|email|max:100',
         ]);
 
         if (!empty($validated['pic'])) {

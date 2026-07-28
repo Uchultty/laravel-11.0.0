@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     @else
-                        <input type="hidden" name="id_barang_proses" value="{{ $prefillData['id_barang_proses'] ?? '' }}">
+                        <input type="hidden" name="id_pemesanan_produk" value="{{ $prefillData['id_pemesanan_produk'] ?? '' }}">
                         <input type="hidden" name="material_nama_prefill" value="{{ $prefillData['material_nama'] ?? $prefillData['material_kategori_nama'] ?? '' }}">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -185,7 +185,7 @@
                 type="button"
                 variant="secondary"
                 class="w-full"
-                onclick="openCancelReserveModal('{{ $prefillData['id_barang_proses'] }}')">
+                onclick="openCancelReserveModal('{{ $prefillData['id_pemesanan_produk'] }}')">
                 Batal
             </x-ui.button>
         @endif

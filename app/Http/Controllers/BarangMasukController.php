@@ -46,7 +46,7 @@ class BarangMasukController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_barang' => 'required|string|max:255',
+            'nama_barang' => 'required|string|max:100',
             'id_supplier' => 'required|exists:suppliers,id_supplier',
             'quantity' => 'required|integer|min:1',
             'tanggal_masuk' => 'required|date',

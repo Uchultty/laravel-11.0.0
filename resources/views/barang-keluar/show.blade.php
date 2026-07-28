@@ -88,7 +88,7 @@
                         </thead>
                         <tbody>
                             @foreach($pengiriman_produk->items as $it)
-                                @php $pi = $productionItems->get($it['id_barang_proses'] ?? null); @endphp
+                                @php $pi = $productionItems->get($it['id_pemesanan_produk'] ?? null); @endphp
                                 <tr class="border-t border-sand-100">
                                     <td class="px-4 py-2 text-ink-900 font-medium">{{ optional($pi?->produk)->nama ?? '-' }}</td>
                                     <td class="px-4 py-2 text-ink-900">{{ $pi?->ukuran ?? '-' }}</td>

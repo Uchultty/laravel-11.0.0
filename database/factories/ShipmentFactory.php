@@ -21,7 +21,7 @@ class ShipmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'id_barang_proses' => ProductionItem::factory(),
+            'id_pemesanan_produk' => ProductionItem::factory(),
             'id_produk' => Product::factory(),
             'id_pelanggan' => Customer::factory(),
             'id_user' => User::factory(),

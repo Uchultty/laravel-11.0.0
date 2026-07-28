@@ -102,7 +102,7 @@ Artisan::command('inventory:backfill', function () {
         }
 
         $productionRows = [];
-        foreach (DB::table('barang_dalam_proses')->orderBy('id_barang_proses')->get() as $barangDalamProses) {
+        foreach (DB::table('barang_dalam_proses')->orderBy('id_pemesanan_produk')->get() as $barangDalamProses) {
             $productId = $productMap[(string) $barangDalamProses->id_barang] ?? null;
             $materialId = $materialMap[(string) $barangDalamProses->id_barang_mentah] ?? null;
 
@@ -111,7 +111,7 @@ Artisan::command('inventory:backfill', function () {
             }
 
             $productionRows[] = [
-                'legacy_barang_proses_id' => (string) $barangDalamProses->id_barang_proses,
+                'legacy_barang_proses_id' => (string) $barangDalamProses->id_pemesanan_produk,
                 'id_produk' => $productId,
                 'id_material' => $materialId,
                 'id_pelanggan' => $barangDalamProses->id_customer,
@@ -132,19 +132,19 @@ Artisan::command('inventory:backfill', function () {
         }
 
         if ($productionRows !== []) {
-            DB::table('barang_dalam_proses')->upsert(
+            DB::table('pemesanan_produk')->upsert(
                 $productionRows,
                 ['legacy_barang_proses_id'],
                 ['id_produk', 'id_material', 'id_pelanggan', 'id_user', 'qty', 'satuan', 'ukuran', 'tgl_dibuat', 'tgl_selesai', 'status_kirim', 'processing', 'reserve_token', 'processing_started_at', 'processing_by', 'updated_at']
             );
         }
 
-        $productionMap = DB::table('barang_dalam_proses')->pluck('id_barang_proses', 'legacy_barang_proses_id')->all();
+        $productionMap = DB::table('pemesanan_produk')->pluck('id_pemesanan_produk', 'legacy_barang_proses_id')->all();
 
         $shipmentRows = [];
         foreach (DB::table('barang_keluar')->orderBy('id_barang_keluar')->get() as $barangKeluar) {
             $productId = $productMap[(string) $barangKeluar->id_barang] ?? null;
-            $productionId = $productionMap[(string) $barangKeluar->id_barang_proses] ?? null;
+            $productionId = $productionMap[(string) $barangKeluar->id_pemesanan_produk] ?? null;
 
             if (! $productId || ! $productionId) {
                 continue;
@@ -152,7 +152,7 @@ Artisan::command('inventory:backfill', function () {
 
             $shipmentRows[] = [
                 'legacy_barang_keluar_id' => $barangKeluar->id_barang_keluar,
-                'id_barang_proses' => $productionId,
+                'id_pemesanan_produk' => $productionId,
                 'id_produk' => $productId,
                 'id_pelanggan' => $barangKeluar->id_customer,
                 'id_user' => $barangKeluar->id_user,
@@ -172,7 +172,7 @@ Artisan::command('inventory:backfill', function () {
             DB::table('pengiriman_barang')->upsert(
                 $shipmentRows,
                 ['legacy_barang_keluar_id'],
-                ['id_barang_proses', 'id_produk', 'id_pelanggan', 'id_user', 'qty', 'tanggal_pengiriman', 'status_pengiriman', 'material_type', 'invoice_path', 'surat_jalan_path', 'gambar_path', 'updated_at']
+                ['id_pemesanan_produk', 'id_produk', 'id_pelanggan', 'id_user', 'qty', 'tanggal_pengiriman', 'status_pengiriman', 'material_type', 'invoice_path', 'surat_jalan_path', 'gambar_path', 'updated_at']
             );
         }
     });
@@ -202,9 +202,9 @@ Artisan::command('inventory:validate-parity', function () {
             'modularCount' => DB::table('material_orders')->count(),
         ],
         [
-            'label' => 'barang_dalam_proses',
-            'legacyCount' => DB::table('barang_dalam_proses')->count(),
-            'modularCount' => DB::table('barang_dalam_proses')->count(),
+            'label' => 'pemesanan_produk',
+            'legacyCount' => DB::table('pemesanan_produk')->count(),
+            'modularCount' => DB::table('pemesanan_produk')->count(),
         ],
         [
             'label' => 'pengiriman_barang',
@@ -235,15 +235,15 @@ Artisan::command('inventory:validate-parity', function () {
                 ->count(),
         ],
         [
-            'label' => 'barang_dalam_proses.material',
-            'query' => DB::table('barang_dalam_proses as pi')
+            'label' => 'pemesanan_produk.material',
+            'query' => DB::table('pemesanan_produk as pi')
                 ->leftJoin('materials as m', 'm.id_material', '=', 'pi.id_material')
                 ->whereNull('m.id_material')
                 ->count(),
         ],
         [
-            'label' => 'barang_dalam_proses.product',
-            'query' => DB::table('barang_dalam_proses as pi')
+            'label' => 'pemesanan_produk.product',
+            'query' => DB::table('pemesanan_produk as pi')
                 ->leftJoin('products as p', 'p.id_product', '=', 'pi.id_produk')
                 ->whereNull('p.id_product')
                 ->count(),
@@ -251,8 +251,8 @@ Artisan::command('inventory:validate-parity', function () {
         [
             'label' => 'pengiriman_barang.production_item',
             'query' => DB::table('pengiriman_barang as s')
-                ->leftJoin('barang_dalam_proses as pi', 'pi.id_barang_proses', '=', 's.id_barang_proses')
-                ->whereNull('pi.id_barang_proses')
+                ->leftJoin('pemesanan_produk as pi', 'pi.id_pemesanan_produk', '=', 's.id_pemesanan_produk')
+                ->whereNull('pi.id_pemesanan_produk')
                 ->count(),
         ],
     ];

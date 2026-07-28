@@ -55,7 +55,7 @@ class LaporanPengirimanProdukExportPdfTest extends TestCase
         Shipment::query()->create([
             'id_produk' => $product->id_product,
             'id_pelanggan' => $customer->id_customer,
-            'id_barang_proses' => $productionItem->id_barang_proses,
+            'id_pemesanan_produk' => $productionItem->id_pemesanan_produk,
             'qty' => 12,
             'status_pengiriman' => 'Selesai',
             'tanggal_pengiriman' => now()->toDateString(),

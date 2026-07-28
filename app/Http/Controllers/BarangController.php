@@ -129,7 +129,7 @@ class BarangController extends Controller
                 'nama' => [
                     'required',
                     'string',
-                    'max:255',
+                    'max:100',
                     Rule::unique($targetTable, 'nama')->where(fn ($query) => $query->where('ukuran', $request->input('ukuran'))),
                 ],
                 'satuan' => 'required|in:mm,inch',
@@ -137,7 +137,7 @@ class BarangController extends Controller
                 'ukuran' => [
                     'required',
                     'string',
-                    'max:100',
+                    'max:50',
                 ],
             ]);
         } else {
@@ -145,14 +145,14 @@ class BarangController extends Controller
                 'nama' => [
                     'required',
                     'string',
-                    'max:255',
+                    'max:100',
                     Rule::unique($targetTable, 'nama')->where(fn ($query) => $query->where('ukuran', $request->input('ukuran'))),
                 ],
                 'satuan' => 'required|in:mm,inch',
                 'ukuran' => [
                     'required',
                     'string',
-                    'max:100',
+                    'max:50',
                 ],
                 'materials' => 'required|array|min:1',
                 'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],
@@ -258,7 +258,7 @@ class BarangController extends Controller
                 'nama' => [
                     'required',
                     'string',
-                    'max:255',
+                    'max:100',
                     Rule::unique($targetTable, 'nama')
                         ->where(fn ($query) => $query->where('ukuran', $request->input('ukuran')))
                         ->ignore($barangModel->getKey(), $barangModel->getKeyName()),
@@ -268,7 +268,7 @@ class BarangController extends Controller
                 'ukuran' => [
                     'required',
                     'string',
-                    'max:100',
+                    'max:50',
                 ],
             ]);
         } else {
@@ -276,7 +276,7 @@ class BarangController extends Controller
                 'nama' => [
                     'required',
                     'string',
-                    'max:255',
+                    'max:100',
                     Rule::unique($targetTable, 'nama')
                         ->where(fn ($query) => $query->where('ukuran', $request->input('ukuran')))
                         ->ignore($barangModel->getKey(), $barangModel->getKeyName()),
@@ -285,7 +285,7 @@ class BarangController extends Controller
                 'ukuran' => [
                     'required',
                     'string',
-                    'max:100',
+                    'max:50',
                 ],
                 'materials' => 'required|array|min:1',
                 'materials.*.id_material' => ['required', 'integer', 'distinct', Rule::exists('materials', 'id_material')],

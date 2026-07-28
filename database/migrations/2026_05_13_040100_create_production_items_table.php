@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('production_items', function (Blueprint $table) {
-            $table->id('id_barang_proses');
+        Schema::create('pemesanan_produk', function (Blueprint $table) {
+            $table->id('id_pemesanan_produk');
             $table->string('legacy_barang_proses_id')->nullable()->unique();
             $table->foreignId('id_produk')->constrained('products', 'id_product')->restrictOnDelete();
             $table->foreignId('id_material')->constrained('materials', 'id_material')->restrictOnDelete();
@@ -42,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('production_items');
+        Schema::dropIfExists('pemesanan_produk');
     }
 };

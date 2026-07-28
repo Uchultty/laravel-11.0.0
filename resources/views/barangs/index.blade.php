@@ -87,7 +87,7 @@
                         type="text"
                         name="q"
                         value="{{ $search }}"
-                        placeholder="{{ $isProduk ? 'Cari nama produk, ukuran, atau satuan...' : 'Cari nama material, ukuran, atau satuan...' }}"
+                        placeholder="{{ $isProduk ? 'Cari nama produk...' : 'Cari nama material...' }}"
                         class="w-full px-4 py-2.5 border border-ink-200 rounded-lg text-sm placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     />
                 </div>

@@ -85,7 +85,7 @@ return new class extends Migration
                 })
         );
 
-        DB::table('production_items')->insertUsing(
+        DB::table('pemesanan_produk')->insertUsing(
             [
                 'legacy_barang_proses_id',
                 'id_produk',
@@ -108,18 +108,18 @@ return new class extends Migration
             DB::table('barang_dalam_proses as bdp')
                 ->join('products as p', 'p.source_barang_id', '=', 'bdp.id_barang')
                 ->join('materials as m', 'm.source_barang_id', '=', 'bdp.id_barang_mentah')
-                ->selectRaw('CAST(bdp.id_barang_proses AS text) as legacy_barang_proses_id, p.id_product as id_produk, m.id_material as id_material, bdp.id_customer as id_pelanggan, bdp.id_user, bdp.quantity as qty, bdp.satuan, bdp.ukuran, DATE(bdp.created_at) as tgl_dibuat, bdp.tanggal_selesai as tgl_selesai, bdp.status_kirim, bdp.processing, bdp.reserve_token, bdp.processing_started_at, bdp.processing_by, bdp.created_at, bdp.updated_at')
+                ->selectRaw('CAST(bdp.id_pemesanan_produk AS text) as legacy_barang_proses_id, p.id_product as id_produk, m.id_material as id_material, bdp.id_customer as id_pelanggan, bdp.id_user, bdp.quantity as qty, bdp.satuan, bdp.ukuran, DATE(bdp.created_at) as tgl_dibuat, bdp.tanggal_selesai as tgl_selesai, bdp.status_kirim, bdp.processing, bdp.reserve_token, bdp.processing_started_at, bdp.processing_by, bdp.created_at, bdp.updated_at')
                 ->whereNotExists(function ($query) {
                     $query->selectRaw('1')
-                        ->from('production_items as pi')
-                        ->whereRaw('pi.legacy_barang_proses_id = CAST(bdp.id_barang_proses AS text)');
+                        ->from('pemesanan_produk as pi')
+                        ->whereRaw('pi.legacy_barang_proses_id = CAST(bdp.id_pemesanan_produk AS text)');
                 })
         );
 
         DB::table('shipments')->insertUsing(
             [
                 'legacy_barang_keluar_id',
-                'id_barang_proses',
+                'id_pemesanan_produk',
                 'id_produk',
                 'id_pelanggan',
                 'id_user',
@@ -135,7 +135,7 @@ return new class extends Migration
             ],
             DB::table('barang_keluar as bk')
                 ->join('products as p', 'p.source_barang_id', '=', 'bk.id_barang')
-                ->selectRaw('CAST(bk.id_barang_keluar AS text) as legacy_barang_keluar_id, bk.id_barang_proses, p.id_product as id_produk, bk.id_customer as id_pelanggan, bk.id_user, bk.quantity as qty, bk.tanggal_keluar as tanggal_pengiriman, bk.status_pengiriman, bk.material_type, bk.invoice_path, bk.surat_jalan_path, bk.gambar_path, bk.created_at, bk.updated_at')
+                ->selectRaw('CAST(bk.id_barang_keluar AS text) as legacy_barang_keluar_id, bk.id_pemesanan_produk, p.id_product as id_produk, bk.id_customer as id_pelanggan, bk.id_user, bk.quantity as qty, bk.tanggal_keluar as tanggal_pengiriman, bk.status_pengiriman, bk.material_type, bk.invoice_path, bk.surat_jalan_path, bk.gambar_path, bk.created_at, bk.updated_at')
                 ->whereNotExists(function ($query) {
                     $query->selectRaw('1')
                         ->from('shipments as s')
@@ -150,7 +150,7 @@ return new class extends Migration
             ->whereNotNull('legacy_barang_keluar_id')
             ->delete();
 
-        DB::table('production_items')
+        DB::table('pemesanan_produk')
             ->whereNotNull('legacy_barang_proses_id')
             ->delete();
 

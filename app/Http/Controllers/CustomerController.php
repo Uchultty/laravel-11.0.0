@@ -31,8 +31,8 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:pelanggan,nama',
-            'pic' => 'nullable|string|max:255',
+            'nama' => 'required|string|max:100|unique:pelanggan,nama',
+            'pic' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -48,7 +48,7 @@ class CustomerController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email',
+            'email' => 'nullable|email|max:100',
         ]);
 
         if (!empty($validated['pic'])) {
@@ -77,8 +77,8 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $pelanggan)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:pelanggan,nama,' . $pelanggan->id_pelanggan . ',id_pelanggan',
-            'pic' => 'nullable|string|max:255',
+            'nama' => 'required|string|max:100|unique:pelanggan,nama,' . $pelanggan->id_pelanggan . ',id_pelanggan',
+            'pic' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'kontak' => [
                 'nullable',
@@ -94,7 +94,7 @@ class CustomerController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email',
+            'email' => 'nullable|email|max:100',
         ]);
 
         if (!empty($validated['pic'])) {

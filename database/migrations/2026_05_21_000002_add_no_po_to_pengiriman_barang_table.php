@@ -10,7 +10,7 @@ return new class extends Migration
     {
         if (! Schema::hasColumn('pengiriman_barang', 'no_po')) {
             Schema::table('pengiriman_barang', function (Blueprint $table) {
-                $table->string('no_po', 100)->nullable()->after('id_barang_proses');
+                $table->string('no_po', 100)->nullable()->after('id_pemesanan_produk');
             });
         }
     }

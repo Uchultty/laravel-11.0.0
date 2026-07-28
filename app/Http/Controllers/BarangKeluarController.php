@@ -75,9 +75,9 @@ class BarangKeluarController extends Controller
             } else {
                 $isGroup = isset($prefillData['mode']) && $prefillData['mode'] === 'group';
                 if ($isGroup) {
-                    $itemIds = collect($prefillData['items'] ?? [])->pluck('id_barang_proses')->filter()->all();
+                    $itemIds = collect($prefillData['items'] ?? [])->pluck('id_pemesanan_produk')->filter()->all();
                     if (! empty($itemIds)) {
-                        ProductionItem::query()->whereIn('id_barang_proses', $itemIds)->update([
+                        ProductionItem::query()->whereIn('id_pemesanan_produk', $itemIds)->update([
                             'processing' => false,
                             'reserve_token' => null,
                             'processing_started_at' => null,
@@ -85,9 +85,9 @@ class BarangKeluarController extends Controller
                         ]);
                     }
                 } else {
-                    $id = $prefillData['id_barang_proses'] ?? null;
+                    $id = $prefillData['id_pemesanan_produk'] ?? null;
                     if ($id) {
-                        ProductionItem::where('id_barang_proses', $id)->update([
+                        ProductionItem::where('id_pemesanan_produk', $id)->update([
                             'processing' => false,
                             'reserve_token' => null,
                             'processing_started_at' => null,
@@ -108,7 +108,7 @@ class BarangKeluarController extends Controller
         $poItems = ProductionItem::query()
             ->where('status_kirim', true)
             ->whereNotNull('no_po')
-            ->get(['id_barang_proses', 'id_produk', 'no_po']);
+            ->get(['id_pemesanan_produk', 'id_produk', 'no_po']);
 
         $isGroupPrefill = isset($prefillData['mode']) && $prefillData['mode'] === 'group' && ! empty($prefillData['items']);
 
@@ -145,7 +145,7 @@ class BarangKeluarController extends Controller
                 $firstProductionItem = null;
 
                 foreach ($items as $prefillItem) {
-                    $idBarangProses = $prefillItem['id_barang_proses'] ?? null;
+                    $idBarangProses = $prefillItem['id_pemesanan_produk'] ?? null;
 
                     if (! $idBarangProses) {
                         continue;
@@ -165,7 +165,7 @@ class BarangKeluarController extends Controller
                     $totalQty += $qty;
 
                     $itemsData[] = [
-                        'id_barang_proses' => $idBarangProses,
+                        'id_pemesanan_produk' => $idBarangProses,
                         'id_produk' => $prefillItem['id_barang'] ?? $productionItem->id_produk,
                         'no_gambar' => $prefillItem['no_gambar'] ?? $productionItem->no_gambar,
                         'qty' => $qty,
@@ -183,7 +183,7 @@ class BarangKeluarController extends Controller
                 $shipment = BarangKeluar::create([
                     'id_produk' => $itemsData[0]['id_produk'],
                     'id_pelanggan' => $prefillData['id_customer'] ?? $firstProductionItem->id_pelanggan,
-                    'id_barang_proses' => $firstIdBarangProses,
+                    'id_pemesanan_produk' => $firstIdBarangProses,
                     'no_po' => $prefillData['no_po'] ?? $firstProductionItem->no_po,
                     'no_gambar' => $itemsData[0]['no_gambar'],
                     'qty' => $totalQty,
@@ -197,10 +197,10 @@ class BarangKeluarController extends Controller
                 ]);
 
                 foreach ($items as $prefillItem) {
-                    $idBarangProses = $prefillItem['id_barang_proses'] ?? null;
+                    $idBarangProses = $prefillItem['id_pemesanan_produk'] ?? null;
                     if ($idBarangProses) {
                         ProductionItem::query()
-                            ->where('id_barang_proses', $idBarangProses)
+                            ->where('id_pemesanan_produk', $idBarangProses)
                             ->update([
                                 'status_kirim' => true,
                                 'processing' => false,
@@ -229,16 +229,16 @@ class BarangKeluarController extends Controller
             'status_pengiriman' => 'nullable|string|in:Siap Dikirim,Sedang Dikirim,Selesai',
             'surat_jalan' => 'nullable|file|max:5120',
             'invoice' => 'nullable|file|max:5120',
-            'id_barang_proses' => 'nullable',
+            'id_pemesanan_produk' => 'nullable',
             'material_nama_prefill' => 'nullable|string',
         ]);
 
-        $idBarangProses = $validated['id_barang_proses'] ?? ($prefillData['id_barang_proses'] ?? null);
+        $idBarangProses = $validated['id_pemesanan_produk'] ?? ($prefillData['id_pemesanan_produk'] ?? null);
 
-        // CRITICAL: Verify that id_barang_proses exists before setting it
+        // CRITICAL: Verify that id_pemesanan_produk exists before setting it
         // If it doesn't exist (was deleted), set to NULL to avoid FK violation
         if (! empty($idBarangProses)) {
-            $prosesExists = ProductionItem::where('id_barang_proses', $idBarangProses)->exists();
+            $prosesExists = ProductionItem::where('id_pemesanan_produk', $idBarangProses)->exists();
             if (! $prosesExists) {
                 $idBarangProses = null;
             }
@@ -251,7 +251,7 @@ class BarangKeluarController extends Controller
         $data = [
             'id_produk' => $validated['id_barang'],
             'id_pelanggan' => $validated['id_customer'] ?? $prefillData['id_customer'] ?? null,
-            'id_barang_proses' => $idBarangProses,
+            'id_pemesanan_produk' => $idBarangProses,
             'no_po' => $validated['no_po'] ?? ($prefillData['no_po'] ?? null),
             'no_gambar' => $validated['no_gambar'] ?? ($prefillData['no_gambar'] ?? null),
             'qty' => $validated['quantity'],
@@ -286,7 +286,7 @@ class BarangKeluarController extends Controller
             BarangKeluar::create($data);
 
             if (! empty($idBarangProses)) {
-                $proses = ProductionItem::query()->where('id_barang_proses', $idBarangProses)->first();
+                $proses = ProductionItem::query()->where('id_pemesanan_produk', $idBarangProses)->first();
                 if ($proses) {
                     $proses->update([
                         'status_kirim' => true,
@@ -312,12 +312,12 @@ class BarangKeluarController extends Controller
 
         $productionItems = collect();
         if (!empty($pengiriman_produk->items) && is_array($pengiriman_produk->items)) {
-            $ids = collect($pengiriman_produk->items)->pluck('id_barang_proses')->filter()->values();
+            $ids = collect($pengiriman_produk->items)->pluck('id_pemesanan_produk')->filter()->values();
             if ($ids->isNotEmpty()) {
-                $productionItems = ProductionItem::whereIn('id_barang_proses', $ids)
+                $productionItems = ProductionItem::whereIn('id_pemesanan_produk', $ids)
                     ->with('produk')
                     ->get()
-                    ->keyBy('id_barang_proses');
+                    ->keyBy('id_pemesanan_produk');
             }
         }
 

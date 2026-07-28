@@ -88,7 +88,7 @@
                                 type="text"
                                 name="q"
                                 value="{{ $search }}"
-                                placeholder="Cari nama material, ukuran, atau satuan..."
+                                placeholder="Cari nama material..."
                                 class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm placeholder-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
                             />
                         </div>

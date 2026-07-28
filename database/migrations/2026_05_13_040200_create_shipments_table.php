@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->id('id_pengiriman');
             $table->string('legacy_barang_keluar_id')->nullable()->unique();
-            $table->foreignId('id_barang_proses')->constrained('production_items', 'id_barang_proses')->restrictOnDelete();
+            $table->foreignId('id_pemesanan_produk')->constrained('pemesanan_produk', 'id_pemesanan_produk')->restrictOnDelete();
             $table->foreignId('id_produk')->constrained('products', 'id_product')->restrictOnDelete();
             $table->foreignId('id_pelanggan')->nullable()->constrained('customers', 'id_customer')->nullOnDelete();
             $table->foreignId('id_user')->constrained('users', 'id_user')->restrictOnDelete();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('gambar_path')->nullable();
             $table->timestamps();
 
-            $table->index(['id_barang_proses', 'id_produk']);
+            $table->index(['id_pemesanan_produk', 'id_produk']);
             $table->index('tanggal_pengiriman');
             $table->index('status_pengiriman');
         });

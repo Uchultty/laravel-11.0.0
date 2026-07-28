@@ -74,7 +74,7 @@ class JenisBarangController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:jenis_barang,nama',
+            'nama' => 'required|string|max:50|unique:jenis_barang,nama',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -96,7 +96,7 @@ class JenisBarangController extends Controller
     public function update(Request $request, JenisBarang $jenisBarang)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255|unique:jenis_barang,nama,' . $jenisBarang->id_jenis_barang . ',id_jenis_barang',
+            'nama' => 'required|string|max:50|unique:jenis_barang,nama,' . $jenisBarang->id_jenis_barang . ',id_jenis_barang',
             'deskripsi' => 'nullable|string',
         ]);
 

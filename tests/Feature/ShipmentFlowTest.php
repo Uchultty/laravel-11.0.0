@@ -54,7 +54,7 @@ class ShipmentFlowTest extends TestCase
                 'quantity' => 5,
                 'tanggal_keluar' => now()->toDateString(),
                 'status_pengiriman' => 'Siap Dikirim',
-                'id_barang_proses' => $productionItem->id_barang_proses,
+                'id_pemesanan_produk' => $productionItem->id_pemesanan_produk,
             ])
             ->assertRedirect(route('pengiriman-produk.index'));
 

@@ -22,7 +22,7 @@ class BarangDalamProsesController extends Controller
                 'produk:id_product,nama',
                 'material:id_material,nama',
                 'pelanggan:id_pelanggan,nama',
-                'shipment:id_pengiriman,id_barang_proses',
+                'shipment:id_pengiriman,id_pemesanan_produk',
             ])
             ->where('status_kirim', false);
 
@@ -140,7 +140,7 @@ class BarangDalamProsesController extends Controller
             'id_customer' => 'required|exists:pelanggan,id_pelanggan',
             'no_po' => 'required|string|max:100',
             'satuan' => 'required|in:mm,inch',
-            'ukuran' => 'required|string|max:100',
+            'ukuran' => 'required|string|max:50',
             'tanggal_buat' => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_buat',
         ]);
@@ -274,7 +274,7 @@ class BarangDalamProsesController extends Controller
 
         // Prepare a plain array (no objects/Closures) for session to avoid offset errors
         $payload = [
-            'id_barang_proses' => $productionItem->id_barang_proses,
+            'id_pemesanan_produk' => $productionItem->id_pemesanan_produk,
             'id_barang' => $product->id_product,
             'no_gambar' => $productionItem->no_gambar ?? null,
             'id_material' => $material->id_material,
@@ -325,7 +325,7 @@ class BarangDalamProsesController extends Controller
 
         $freshItems = $items->map(function (ProductionItem $item) {
             return [
-                'id_barang_proses' => $item->id_barang_proses,
+                'id_pemesanan_produk' => $item->id_pemesanan_produk,
                 'id_barang' => $item->id_produk,
                 'id_material' => $item->id_material,
                 'barang_nama' => (string) optional($item->produk)->nama,
@@ -367,7 +367,7 @@ class BarangDalamProsesController extends Controller
         ]);
 
         $prefill = session('pengiriman_dari_proses');
-        if (is_array($prefill) && (($prefill['id_barang_proses'] ?? null) == $productionItem->id_barang_proses)) {
+        if (is_array($prefill) && (($prefill['id_pemesanan_produk'] ?? null) == $productionItem->id_pemesanan_produk)) {
             session()->forget('pengiriman_dari_proses');
         }
 
@@ -378,11 +378,11 @@ class BarangDalamProsesController extends Controller
     {
         $prefill = session('pengiriman_dari_proses');
 
-        $itemIds = collect($prefill['items'] ?? [])->pluck('id_barang_proses')->filter()->all();
+        $itemIds = collect($prefill['items'] ?? [])->pluck('id_pemesanan_produk')->filter()->all();
 
         if (! empty($itemIds)) {
             ProductionItem::query()
-                ->whereIn('id_barang_proses', $itemIds)
+                ->whereIn('id_pemesanan_produk', $itemIds)
                 ->update([
                     'processing' => false,
                     'reserve_token' => null,

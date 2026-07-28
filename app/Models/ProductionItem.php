@@ -9,8 +9,8 @@ class ProductionItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'barang_dalam_proses';
-    protected $primaryKey = 'id_barang_proses';
+    protected $table = 'pemesanan_produk';
+    protected $primaryKey = 'id_pemesanan_produk';
 
     protected $fillable = [
         'legacy_barang_proses_id',
@@ -64,7 +64,7 @@ class ProductionItem extends Model
 
     public function shipment()
     {
-        return $this->hasOne(Shipment::class, 'id_barang_proses', 'id_barang_proses');
+        return $this->hasOne(Shipment::class, 'id_pemesanan_produk', 'id_pemesanan_produk');
     }
 
     public function getIsSiapDikirimAttribute(): bool

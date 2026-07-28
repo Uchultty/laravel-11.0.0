@@ -14,7 +14,7 @@ class Shipment extends Model
 
     protected $fillable = [
         'legacy_barang_keluar_id',
-        'id_barang_proses',
+        'id_pemesanan_produk',
         'id_produk',
         'id_pelanggan',
         'no_po',
@@ -44,7 +44,7 @@ class Shipment extends Model
 
     public function productionItem()
     {
-        return $this->belongsTo(ProductionItem::class, 'id_barang_proses', 'id_barang_proses');
+        return $this->belongsTo(ProductionItem::class, 'id_pemesanan_produk', 'id_pemesanan_produk');
     }
 
     public function produk()

@@ -19,7 +19,7 @@ use App\Http\Controllers\UserManagementController;
 Route::bind('barangDalamProses', function ($id) {
     return ProductionItem::query()
         ->where('legacy_barang_proses_id', (string) $id)
-        ->orWhere('id_barang_proses', (int) $id)
+        ->orWhere('id_pemesanan_produk', (int) $id)
         ->firstOrFail();
 });
 

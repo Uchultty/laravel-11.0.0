@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('barang_dalam_proses', function (Blueprint $table) {
-            $table->renameColumn('id', 'id_barang_proses');
+            $table->renameColumn('id', 'id_pemesanan_produk');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('barang_dalam_proses', function (Blueprint $table) {
-            $table->renameColumn('id_barang_proses', 'id');
+            $table->renameColumn('id_pemesanan_produk', 'id');
         });
     }
 };
